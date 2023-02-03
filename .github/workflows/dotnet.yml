@@ -24,9 +24,5 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet pack --no-restore
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5
     - name: Push nuget
-      run: dotnet nuget push dotnet-outdated-nukeeper/dotnet-outdated-nukeeper/bin/Debug/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
-    # - name: Push nuget tool
-    #   run: nuget push MyProject.sln
+      run: dotnet nuget push dotnet-outdated-nukeeper/bin/Debug/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
