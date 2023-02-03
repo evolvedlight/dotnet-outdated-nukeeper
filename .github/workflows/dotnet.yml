@@ -23,6 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet pack --no-restore
+      run: dotnet pack .\dotnet-outdated-nukeeper\dotnet-outdated-nukeeper.csproj -c release -p:PackageVersion=1.0.1
     - name: Push nuget
-      run: dotnet nuget push dotnet-outdated-nukeeper/bin/Debug/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push dotnet-outdated-nukeeper/nupkg/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
