@@ -8,5 +8,5 @@ Supported providers:
 
 | Provider | Support |
 | -------- | ------- |
-| Github   | (/)     |
+| Github   | :hammer:|
 
