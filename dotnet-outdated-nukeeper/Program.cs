@@ -38,7 +38,6 @@ namespace DotNetOutdated
         private readonly IProjectDiscoveryService _projectDiscoveryService;
         private readonly IDotNetAddPackageService _dotNetAddPackageService;
         private readonly ICentralPackageVersionManagementService _centralPackageVersionManagementService;
-        private readonly ISourceControlService _sourceControlService;
         private readonly IRemoteRepoServiceSelector _remoteRepoSelector;
 
         [Option(CommandOptionType.NoValue, Description = "Specifies whether to include auto-referenced packages.",
@@ -122,7 +121,7 @@ namespace DotNetOutdated
             LongName = "commitEmail")]
         public string CommitEmail { get; set; }
 
-        [Option(CommandOptionType.SingleOrNoValue, Description = "Github Token (if github used)",
+        [Option(CommandOptionType.SingleOrNoValue, Description = "Github Token (if github used). Also available via \"GITHUB_TOKEN\" environment variable",
             LongName = "githubtoken")]
         public string GithubToken { get; set; }
 
@@ -143,7 +142,6 @@ namespace DotNetOutdated
                     .AddSingleton<INuGetPackageResolutionService, NuGetPackageResolutionService>()
                     .AddSingleton<ICentralPackageVersionManagementService, CentralPackageVersionManagementService>();
 
-            //services.AddSingleton<ISourceControlService, GithubService>();
             services.AddSingleton<IRemoteRepoServiceSelector, RemoteRepoServiceSelector>();
 
             using (var sp = services
