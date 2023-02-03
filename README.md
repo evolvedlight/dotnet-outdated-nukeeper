@@ -10,3 +10,6 @@ Supported providers:
 | -------- | ------- |
 | Github   | :hammer:|
 
+# Demo
+
+[![asciicast](https://asciinema.org/a/HcKEUfP92Mg4yURqS1cnaBjMI.svg)](https://asciinema.org/a/HcKEUfP92Mg4yURqS1cnaBjMI)
