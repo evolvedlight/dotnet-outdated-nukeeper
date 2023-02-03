@@ -6,6 +6,9 @@
     <RootNamespace>dotnet_outdated_nukeeper</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<PackageOutputPath>./nupkg</PackageOutputPath>
+	<ToolCommandName>dotnet-outdated-nukeeper</ToolCommandName>
+	<PackAsTool>true</PackAsTool>
   </PropertyGroup>
 
   <ItemGroup>
