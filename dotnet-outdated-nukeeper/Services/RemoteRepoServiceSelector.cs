@@ -11,7 +11,7 @@ namespace dotnet_outdated_nukeeper.Services
         public ISourceControlService GetRemoteRepoService(string projectUrl, string username, IReadOnlyCollection<CommandOption> options) => projectUrl switch
         {
             var url when url.Contains("github") => GetGithubService(projectUrl, username, options),
-            var url when url.Contains("localhost") => GetBitbucketService(projectUrl, username, options),
+            var url when url.Contains("bitbucket") => GetBitbucketService(projectUrl, username, options),
             _ => throw new NotImplementedException($"Can't handle projectURL {projectUrl}")
         };
 
