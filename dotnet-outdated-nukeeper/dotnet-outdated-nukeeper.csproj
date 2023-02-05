@@ -14,7 +14,6 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="DotNetOutdatedTool.Core" Version="4.3.2" />
-    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage" Version="1.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\dotnet-outdated-nukeeper-github\dotnet-outdated-nukeeper-github.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\dotnet-outdated-nukeeper-bitbucket\dotnet-outdated-nukeeper-bitbucket.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Shared\Shared.csproj" PrivateAssets="all" />
   </ItemGroup>
 

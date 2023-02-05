@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-outdated-nukeeper-gi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-outdated-nukeeper-bitbucket", "dotnet-outdated-nukeeper-bitbucket\dotnet-outdated-nukeeper-bitbucket.csproj", "{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

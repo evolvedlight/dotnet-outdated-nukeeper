@@ -221,7 +221,7 @@ namespace DotNetOutdated
                     {
                         var prDetails = CreatePrDetails(outdatedProjects);
                         var branch = CreateBranch(path, success.Item2, console, prDetails);
-                        var pr = await service.CreatePr(path, prDetails);
+                        var pr = await service.CreatePr(ProjectUrl, path, prDetails);
 
                         console.WriteLine($"Create PR: {pr}");
                     }
@@ -276,6 +276,7 @@ namespace DotNetOutdated
 
             var body = new StringBuilder();
             body.AppendLine("This bumps the following packages:");
+            body.AppendLine();
             body.AppendLine("| Package | Old Version | New Version |");
             body.AppendLine("| - | - | - |");
             foreach (var upgrade in upgrades)
@@ -296,7 +297,7 @@ namespace DotNetOutdated
                 Remote remote = repo.Network.Remotes["origin"];
                 foreach (var projectPath in projectPaths)
                 {
-                    var relativePath = PathUtil.GetRelativePath(repo.Info.WorkingDirectory, projectPath);
+                    var relativePath = Path.GetRelativePath(repo.Info.WorkingDirectory, projectPath);
                     repo.Index.Add(relativePath);
                     console.WriteLine($"Added {relativePath} to branch");
                     repo.Index.Write();
@@ -315,29 +316,6 @@ namespace DotNetOutdated
                 b => b.UpstreamBranch = branch.CanonicalName);
 
                 return branch.CanonicalName;
-            }
-        }
-
-        public class PathUtil
-        {
-            static public string NormalizeFilepath(string filepath)
-            {
-                string result = System.IO.Path.GetFullPath(filepath).ToLowerInvariant();
-
-                result = result.TrimEnd(new[] { '\\' });
-
-                return result;
-            }
-
-            public static string GetRelativePath(string rootPath, string fullPath)
-            {
-                rootPath = NormalizeFilepath(rootPath);
-                fullPath = NormalizeFilepath(fullPath);
-
-                if (!fullPath.StartsWith(rootPath))
-                    throw new Exception("Could not find rootPath in fullPath when calculating relative path.");
-
-                return fullPath.Substring(rootPath.Length + 1);
             }
         }
 

@@ -7,4 +7,8 @@
     <RootNamespace>dotnet_outdated_nukeeper.Shared</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="libgit2sharp-evolvedlight" Version="0.27.0-preview-0000" />
+  </ItemGroup>
+
 </Project>

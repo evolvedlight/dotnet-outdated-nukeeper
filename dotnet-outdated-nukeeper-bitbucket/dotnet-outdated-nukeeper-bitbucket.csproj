@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>dotnet_outdated_nukeeper_github</RootNamespace>
+    <RootNamespace>dotnet_outdated_nukeeper.bitbucket</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Atlassian.Stash.Api" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Octokit" Version="4.0.4" />
   </ItemGroup>
 
   <ItemGroup>

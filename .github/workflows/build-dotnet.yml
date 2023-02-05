@@ -1,13 +1,10 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: dotnet nuget build and package
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  [ push, pull_request ]
 
 jobs:
   build:
@@ -24,5 +21,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet pack dotnet-outdated-nukeeper/dotnet-outdated-nukeeper.csproj -c release -p:PackageVersion=1.0.${{github.run_number}} --output nupkgs
-    - name: Push nuget
-      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
+    - name: Upload nuget
+      uses: actions/upload-artifact@v3
+      with:
+        name: nupkgs
+        path: |
+          nupkgs/*.nupkg

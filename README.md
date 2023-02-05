@@ -10,6 +10,19 @@ Supported providers:
 | -------- | ------- |
 | Github   | :hammer:|
 
+# How to use:
+
+## Github:
+Add an environment variable REPO_TOKEN with a PAT for the repo
+Then run:
+`dotnet-outdated-nukeeper https://github.com/evolvedlight/sample-outdated -pr -u --username="evolvedlight" --commitEmail="steve@brown.bg"`
+
+## BitBucket:
+Add an environment variable REPO_TOKEN 
+Then run:
+```dotnet-outdated-nukeeper http://localhost:17990/projects/TEST/repos/sample-outdated/browse -pr -u --username="evo" --commitEmail="steve@brown.bg"```
+
+
 # Demo
 
 [![asciicast](https://asciinema.org/a/HcKEUfP92Mg4yURqS1cnaBjMI.svg)](https://asciinema.org/a/HcKEUfP92Mg4yURqS1cnaBjMI)
