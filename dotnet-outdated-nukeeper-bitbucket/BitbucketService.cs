@@ -40,7 +40,7 @@ namespace dotnet_outdated_nukeeper.bitbucket
         public BitbucketRepoDetails GetRepoDetailsFromUrl(string projectUrl) 
         {
             // example http://localhost:17990/projects/TEST/repos/sample-outdated/browse => "TEST", "sample-outdated"
-            var regex = new Regex(@"(?<basePath>https?:\/\/.*)\/projects\/(?<projectName>[^\/]*)\/repos\/(?<repoName>[^\/]*)\/browse");
+            var regex = new Regex(@"(?<basePath>https?:\/\/.*)\/(projects|users)\/(?<projectName>[^\/]*)\/repos\/(?<repoName>[^\/]*)\/browse");
             var match = regex.Match(projectUrl);
             if (!match.Success) {
                 throw new ArgumentException($"Couldn't parse url {projectUrl}");
