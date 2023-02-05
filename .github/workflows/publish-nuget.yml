@@ -17,8 +17,8 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Download nuget to publish
-        uses: actions/download-artifact@v3
-        with:
-          name: nugets
+      uses: actions/download-artifact@v3
+      with:
+        name: nugets
     - name: Push nuget
       run: dotnet nuget push nupkgs/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json

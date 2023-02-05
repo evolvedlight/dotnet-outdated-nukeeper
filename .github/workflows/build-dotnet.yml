@@ -25,8 +25,8 @@ jobs:
     - name: Build
       run: dotnet pack dotnet-outdated-nukeeper/dotnet-outdated-nukeeper.csproj -c release -p:PackageVersion=1.0.${{github.run_number}} --output nupkgs
     - name: Upload nuget
-        uses: actions/upload-artifact@v3
-        with:
-          name: nupkgs
-          path: |
-            nupkgs/*.nupkg
+      uses: actions/upload-artifact@v3
+      with:
+        name: nupkgs
+        path: |
+          nupkgs/*.nupkg
