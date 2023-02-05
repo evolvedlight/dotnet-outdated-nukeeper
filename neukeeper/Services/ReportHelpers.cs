@@ -19,6 +19,7 @@ namespace DotNetOutdated.Services
         }
     }
 
+    #nullable disable warnings
     internal class ToStringJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
@@ -41,10 +42,11 @@ namespace DotNetOutdated.Services
             throw new NotImplementedException();
         }
     }
+    #nullable enable warnings
 
     public class Report
     {
-        public List<AnalyzedProject> Projects { get; set; }
+        public List<AnalyzedProject> Projects { get; set; } = new();
 
         internal static string GetTextReportLine(AnalyzedProject project, AnalyzedTargetFramework targetFramework, AnalyzedDependency dependency)
         {

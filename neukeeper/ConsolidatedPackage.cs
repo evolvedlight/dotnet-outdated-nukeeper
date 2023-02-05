@@ -10,18 +10,18 @@ namespace DotNetOutdated
         {
             public string Description => $"{Project} [{Framework}]";
 
-            public NuGetFramework Framework { get; set; }
+            public NuGetFramework? Framework { get; set; }
 
-            public string Project { get; set; }
+            public string? Project { get; set; }
 
-            public string ProjectFilePath { get; set; }
+            public string? ProjectFilePath { get; set; }
         }
 
-        public string Description
+        public string? Description
         {
             get
             {
-                string title = Name;
+                string? title = Name;
 
                 if (IsAutoReferenced)
                     title += " [A]";
@@ -38,13 +38,13 @@ namespace DotNetOutdated
 
         public bool IsVersionCentrallyManaged { get; set; }
 
-        public NuGetVersion LatestVersion { get; set; }
+        public NuGetVersion? LatestVersion { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public List<PackageProjectReference> Projects { get; set; }
+        public List<PackageProjectReference>? Projects { get; set; }
 
-        public NuGetVersion ResolvedVersion { get; set; }
+        public NuGetVersion? ResolvedVersion { get; set; }
 
         public DependencyUpgradeSeverity? UpgradeSeverity { get; set; }
     }

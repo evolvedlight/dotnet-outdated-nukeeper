@@ -36,13 +36,15 @@ namespace neukeeper.providers.github
             } 
         }
 
-        public async Task<string> CloneRepo(string projectUrl)
+        public Task<string> CloneRepo(string projectUrl)
         {
             var directory = GetTemporaryDirectory();
-            var co = new CloneOptions();
-            co.CredentialsProvider = (_url, _user, _cred) => Credentials;
+            var co = new CloneOptions
+            {
+                CredentialsProvider = (_url, _user, _cred) => Credentials
+            };
             LibGit2Sharp.Repository.Clone(projectUrl, directory, co);
-            return directory;
+            return Task.FromResult(directory);
         }
 
         public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails)
