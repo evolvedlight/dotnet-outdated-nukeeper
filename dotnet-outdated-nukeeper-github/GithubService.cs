@@ -45,7 +45,7 @@ namespace dotnet_outdated_nukeeper_github
             return directory;
         }
 
-        public async Task<string> CreatePr(string path, PrDetails prDetails)
+        public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails)
         {
             using (var g2repo = new LibGit2Sharp.Repository(path))
             {
