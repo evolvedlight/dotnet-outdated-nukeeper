@@ -75,11 +75,11 @@ namespace DotNetOutdated.Models
 
         [JsonProperty(Order = 1)]
         [JsonConverter(typeof(ToStringJsonConverter))]
-        public NuGetVersion ResolvedVersion => _dependency.ResolvedVersion;
+        public NuGetVersion? ResolvedVersion => _dependency.ResolvedVersion;
 
         [JsonProperty(Order=2)]
         [JsonConverter(typeof(ToStringJsonConverter))]
-        public NuGetVersion LatestVersion { get; set; }
+        public NuGetVersion? LatestVersion { get; set; }
 
         [JsonProperty(Order=3)]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -106,7 +106,7 @@ namespace DotNetOutdated.Models
             _dependency = dependency;
         }
 
-        public AnalyzedDependency(Dependency dependency, NuGetVersion latestVersion) : this(dependency)
+        public AnalyzedDependency(Dependency dependency, NuGetVersion? latestVersion) : this(dependency)
         {
             LatestVersion = latestVersion;
         }

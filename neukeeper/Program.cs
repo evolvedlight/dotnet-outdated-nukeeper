@@ -24,6 +24,7 @@ namespace DotNetOutdated
     using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Text;
+    using CommunityToolkit.Diagnostics;
 
     [Command(
         Name = "dotnet outdated",
@@ -45,7 +46,7 @@ namespace DotNetOutdated
         public bool IncludeAutoReferences { get; set; } = false;
 
         [Argument(0, Description = "The project URL")]
-        public string ProjectUrl { get; set; }
+        public string? ProjectUrl { get; set; }
 
         [Option(CommandOptionType.SingleValue, Description = "Specifies whether to look for pre-release versions of packages. " +
                                                              "Possible values: Auto (default), Always or Never.",
@@ -86,7 +87,7 @@ namespace DotNetOutdated
         [Option(CommandOptionType.SingleValue, Description = "Specifies the filename for a generated report. " +
                                                              "(Use the -of|--output-format option to specify the format. JSON by default.)",
             ShortName = "o", LongName = "output")]
-        public string OutputFilename { get; set; } = null;
+        public string? OutputFilename { get; set; } = null;
 
         [Option(CommandOptionType.SingleValue, Description = "Specifies the output format for the generated report. " +
                                                              "Possible values: json (default) or csv.",
@@ -115,22 +116,22 @@ namespace DotNetOutdated
 
         [Option(CommandOptionType.SingleOrNoValue, Description = "Username (used for logging in and commit message)",
             ShortName = "un", LongName = "username")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [Option(CommandOptionType.SingleOrNoValue, Description = "Email used in commit message",
             LongName = "commitEmail")]
-        public string CommitEmail { get; set; }
+        public string? CommitEmail { get; set; }
 
         [Option(CommandOptionType.SingleOrNoValue, Description = "Github Token (if github used). Also available via \"GITHUB_TOKEN\" environment variable",
-            LongName = "githubtoken")]
-        public string GithubToken { get; set; }
+            LongName = "repo_token")]
+        public string? RepoToken { get; set; }
 
         public static int Main(string[] args)
         {
             var services = new ServiceCollection();
 
-            services.AddSingleton<IConsole>(PhysicalConsole.Singleton)
-                    .AddSingleton<IReporter>(provider => new ConsoleReporter(provider.GetService<IConsole>()))
+            services.AddSingleton(PhysicalConsole.Singleton)
+                    .AddSingleton<IReporter>(provider => new ConsoleReporter(provider.GetRequiredService<IConsole>()))
                     .AddSingleton<IFileSystem, FileSystem>()
                     .AddSingleton<IProjectDiscoveryService, ProjectDiscoveryService>()
                     .AddSingleton<IProjectAnalysisService, ProjectAnalysisService>()
@@ -156,10 +157,13 @@ namespace DotNetOutdated
             }
         }
 
-        public static string GetVersion() => typeof(Program)
-            .Assembly
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            .InformationalVersion;
+        public static string GetVersion()
+        {
+            var versionAssembly = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+
+            Guard.IsNotNull(versionAssembly, nameof(versionAssembly));
+            return versionAssembly.InformationalVersion;
+        }
 
         public Program(IFileSystem fileSystem, IReporter reporter, INuGetPackageResolutionService nugetService, IProjectAnalysisService projectAnalysisService,
             IProjectDiscoveryService projectDiscoveryService, IDotNetAddPackageService dotNetAddPackageService, ICentralPackageVersionManagementService centralPackageVersionManagementService, IRemoteRepoServiceSelector remoteRepoSelector)
@@ -181,6 +185,10 @@ namespace DotNetOutdated
                 var stopwatch = Stopwatch.StartNew();
 
                 console.Write("Checkout out projects...");
+
+                Guard.IsNotNull(ProjectUrl, nameof(ProjectUrl));
+                Guard.IsNotNull(Username, nameof(Username));
+
                 var service = _remoteRepoSelector.GetRemoteRepoService(ProjectUrl, Username, app.Options);
                 var path = await service.CloneRepo(ProjectUrl);
 
@@ -260,18 +268,20 @@ namespace DotNetOutdated
 
         private PrDetails CreatePrDetails(List<AnalyzedProject> outdatedProjects)
         {
-            var prDetails = new PrDetails();
             var upgrades = outdatedProjects.ConsolidatePackages();
+
+            string? branchName;
+            string? title;
             if (upgrades.Count == 1)
             {
                 var dep = upgrades[0];
-                prDetails.BranchName = $"outdated/{dep.Name}_{dep.LatestVersion}";
-                prDetails.Title = $"Dotnet-Outdated: Upgrade {dep.Name} to {dep.LatestVersion}";
+                branchName = $"outdated/{dep.Name}_{dep.LatestVersion}";
+                title = $"Dotnet-Outdated: Upgrade {dep.Name} to {dep.LatestVersion}";
             }
             else
             {
-                prDetails.BranchName = $"outdated/{DateTime.UtcNow.Ticks}_upgrades";
-                prDetails.Title = $"Dotnet-Outdated: Upgrade {upgrades.Count} packages";
+                branchName = $"outdated/{DateTime.UtcNow.Ticks}_upgrades";
+                title = $"Dotnet-Outdated: Upgrade {upgrades.Count} packages";
             }
 
             var body = new StringBuilder();
@@ -279,13 +289,18 @@ namespace DotNetOutdated
             body.AppendLine();
             body.AppendLine("| Package | Old Version | New Version |");
             body.AppendLine("| - | - | - |");
+
             foreach (var upgrade in upgrades)
             {
                 body.AppendLine($"| {upgrade.Name} | {upgrade.ResolvedVersion} | {upgrade.LatestVersion} |");
             }
-            prDetails.BodyMarkdown = body.ToString();
 
-            return prDetails;
+            return new PrDetails
+            (
+                branchName,
+                title,
+                body.ToString()
+            );
         }
 
         private string CreateBranch(string path, List<string> projectPaths, IConsole console, PrDetails prDetails)
@@ -319,6 +334,7 @@ namespace DotNetOutdated
             }
         }
 
+#nullable disable warnings
         private (bool, List<string>) UpgradePackages(List<AnalyzedProject> projects, IConsole console)
         {
             bool success = true;
@@ -387,6 +403,7 @@ namespace DotNetOutdated
 
             return (success, upgradedProjects);
         }
+#nullable enable warnings
 
         private void PrintColorLegend(IConsole console)
         {
@@ -435,6 +452,7 @@ namespace DotNetOutdated
             console.Write(rest, GetUpgradeSeverityColor(upgradeSeverity));
         }
 
+#nullable disable warnings
         private void ReportOutdatedDependencies(List<AnalyzedProject> projects, IConsole console)
         {
             foreach (var project in projects)
@@ -483,6 +501,7 @@ namespace DotNetOutdated
 
             PrintColorLegend(console);
         }
+#nullable enable warnings
 
         private async Task<List<AnalyzedProject>> AnalyzeDependencies(List<Project> projects, IConsole console)
         {
@@ -570,7 +589,7 @@ namespace DotNetOutdated
         private async Task AddOutdatedDependencyIfNeeded(Project project, TargetFramework targetFramework, Dependency dependency, ConcurrentBag<AnalyzedDependency> outdatedDependencies)
         {
             var referencedVersion = dependency.ResolvedVersion;
-            NuGetVersion latestVersion = null;
+            NuGetVersion? latestVersion = null;
 
             if (referencedVersion != null)
             {
