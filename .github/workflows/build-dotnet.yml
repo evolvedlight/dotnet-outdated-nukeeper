@@ -24,7 +24,7 @@ jobs:
     - name: Upload nuget
       uses: actions/upload-artifact@v3
       with:
-        name: nupkgs
+        name: nugets
         path: |
           nupkgs/*.nupkg
   publish:
