@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "dotnet-outdated-nukeeper": {
-      "commandName": "Project",
-      "commandLineArgs": "https://github.com/evolvedlight/sample-outdated -pr -u"
-    }
-  }
-}

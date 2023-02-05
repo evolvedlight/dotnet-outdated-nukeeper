@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>dotnet_outdated_nukeeper.Shared</RootNamespace>
+    <RootNamespace>neukeeper.Shared</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

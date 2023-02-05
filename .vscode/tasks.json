@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/dotnet-outdated-nukeeper/dotnet-outdated-nukeeper.csproj",
+                "${workspaceFolder}/nuekeeper/neukeeper.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/dotnet-outdated-nukeeper/dotnet-outdated-nukeeper.csproj",
+                "${workspaceFolder}/nuekeeper/neukeeper.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/dotnet-outdated-nukeeper/dotnet-outdated-nukeeper.csproj"
+                "${workspaceFolder}/nuekeeper/neukeeper.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

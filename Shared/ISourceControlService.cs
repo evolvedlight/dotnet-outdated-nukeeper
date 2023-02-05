@@ -1,4 +1,4 @@
-﻿namespace dotnet_outdated_nukeeper.Models
+﻿namespace neukeeper.Models
 {
     public interface ISourceControlService
     {

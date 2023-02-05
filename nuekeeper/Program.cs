@@ -18,8 +18,8 @@ using NuGet.Credentials;
 
 namespace DotNetOutdated
 {
-    using dotnet_outdated_nukeeper.Models;
-    using dotnet_outdated_nukeeper.Services;
+    using neukeeper.Models;
+    using neukeeper.Services;
     using LibGit2Sharp;
     using System.Collections.Concurrent;
     using System.Diagnostics;

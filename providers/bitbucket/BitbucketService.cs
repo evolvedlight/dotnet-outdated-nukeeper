@@ -1,11 +1,11 @@
 ﻿using System.Text.RegularExpressions;
 using Atlassian.Stash;
 using Atlassian.Stash.Entities;
-using dotnet_outdated_nukeeper.Models;
+using neukeeper.Models;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
-namespace dotnet_outdated_nukeeper.bitbucket
+namespace neukeeper.bitbucket
 {
     public class BitbucketService : ISourceControlService
     {
@@ -39,7 +39,6 @@ namespace dotnet_outdated_nukeeper.bitbucket
 
         public BitbucketRepoDetails GetRepoDetailsFromUrl(string projectUrl) 
         {
-            // example http://localhost:17990/projects/TEST/repos/sample-outdated/browse => "TEST", "sample-outdated"
             var regex = new Regex(@"(?<basePath>https?:\/\/.*)\/(projects|users)\/(?<projectName>[^\/]*)\/repos\/(?<repoName>[^\/]*)\/browse");
             var match = regex.Match(projectUrl);
             if (!match.Success) {
@@ -124,7 +123,8 @@ namespace dotnet_outdated_nukeeper.bitbucket
 
     public class BitbucketRepoDetails
     {
-        public string Project { get; set; }
+        public string? Project { get; set; }
+        public string? User { get; set; }
         public string RepoSlug { get; set; }
         public string BasePath { get; internal set; }
     }

@@ -1,10 +1,10 @@
-﻿using dotnet_outdated_nukeeper.Models;
-using dotnet_outdated_nukeeper_github;
-using dotnet_outdated_nukeeper.bitbucket;
+﻿using neukeeper.Models;
+using neukeeper_github;
+using neukeeper.bitbucket;
 using McMaster.Extensions.CommandLineUtils;
 using Octokit;
 
-namespace dotnet_outdated_nukeeper.Services
+namespace neukeeper.Services
 {
     public class RemoteRepoServiceSelector : IRemoteRepoServiceSelector
     {
