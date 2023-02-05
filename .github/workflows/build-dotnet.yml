@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -27,6 +25,23 @@ jobs:
         name: nugets
         path: |
           nupkgs/*.nupkg
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Test with dotnet
+      run: dotnet test --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+    - name: Upload dotnet test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dotnet-results-${{ matrix.dotnet-version }}
+        path: TestResults-${{ matrix.dotnet-version }}
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
   publish:
     runs-on: ubuntu-latest
     needs: build
