@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/nuekeeper/bin/Debug/net7.0/neukeeper.dll",
+            "program": "${workspaceFolder}/neukeeper/bin/Debug/net7.0/neukeeper.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/nuekeeper",
+            "cwd": "${workspaceFolder}/neukeeper",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

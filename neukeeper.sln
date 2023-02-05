@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neukeeper", "nuekeeper\neukeeper.csproj", "{001A8387-EE08-43C8-B697-5C94491C8BE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neukeeper", "neukeeper\neukeeper.csproj", "{001A8387-EE08-43C8-B697-5C94491C8BE2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "github", "providers\github\github.csproj", "{AF525F29-AF13-4EC5-8B9C-23EFBD2F45EF}"
 EndProject
