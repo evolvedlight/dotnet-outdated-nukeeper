@@ -6,8 +6,6 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -15,14 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet pack dotnet-outdated-nukeeper/dotnet-outdated-nukeeper.csproj -c release -p:PackageVersion=1.0.${{github.run_number}} --output nupkgs
+    - name: Download nuget to publish
+        uses: actions/download-artifact@v3
+        with:
+          name: nugets
     - name: Push nuget
       run: dotnet nuget push nupkgs/*.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
