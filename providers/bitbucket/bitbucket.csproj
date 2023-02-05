@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>dotnet_outdated_nukeeper.bitbucket</RootNamespace>
+    <RootNamespace>neukeeper.providers.bitbucket</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\shared\shared.csproj" />
   </ItemGroup>
 
 </Project>

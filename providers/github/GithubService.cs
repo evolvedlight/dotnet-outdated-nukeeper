@@ -1,10 +1,10 @@
-﻿using dotnet_outdated_nukeeper.Models;
+﻿using neukeeper.Models;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using Octokit;
 using Octokit.Internal;
 
-namespace dotnet_outdated_nukeeper_github
+namespace neukeeper.providers.github
 {
     public class GithubService : ISourceControlService
     {
@@ -61,7 +61,7 @@ namespace dotnet_outdated_nukeeper_github
 
 
             InMemoryCredentialStore credentials = new InMemoryCredentialStore(new Octokit.Credentials(_token));
-            var client = new GitHubClient(new ProductHeaderValue("dotnet-outdated-nukeeper"), credentials);
+            var client = new GitHubClient(new ProductHeaderValue("neukeeper"), credentials);
             
             var repo = await client.Repository.Get("evolvedlight", "sample-outdated");
             var newPullRequest = new NewPullRequest(prDetails.Title, prDetails.BranchName, repo.DefaultBranch)

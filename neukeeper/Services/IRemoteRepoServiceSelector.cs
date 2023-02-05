@@ -1,6 +1,6 @@
-﻿using dotnet_outdated_nukeeper.Models;
+﻿using neukeeper.Models;
 
-namespace dotnet_outdated_nukeeper.Services
+namespace neukeeper.Services
 {
     public interface IRemoteRepoServiceSelector
     {

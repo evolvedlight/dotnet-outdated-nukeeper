@@ -3,13 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-outdated-nukeeper", "dotnet-outdated-nukeeper\dotnet-outdated-nukeeper.csproj", "{001A8387-EE08-43C8-B697-5C94491C8BE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neukeeper", "neukeeper\neukeeper.csproj", "{001A8387-EE08-43C8-B697-5C94491C8BE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-outdated-nukeeper-github", "dotnet-outdated-nukeeper-github\dotnet-outdated-nukeeper-github.csproj", "{AF525F29-AF13-4EC5-8B9C-23EFBD2F45EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "github", "providers\github\github.csproj", "{AF525F29-AF13-4EC5-8B9C-23EFBD2F45EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shared", "shared\shared.csproj", "{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-outdated-nukeeper-bitbucket", "dotnet-outdated-nukeeper-bitbucket\dotnet-outdated-nukeeper-bitbucket.csproj", "{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "bitbucket", "providers\bitbucket\bitbucket.csproj", "{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "unittests", "tests\unittests\unittests.csproj", "{C25972F5-E344-46E7-8884-6060B389190F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "providers", "providers", "{A01D711C-54F1-4A8F-8540-7003B91C508E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{179F792A-E1EE-440E-8313-A5ED120E620A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +39,18 @@ Global
 		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C25972F5-E344-46E7-8884-6060B389190F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C25972F5-E344-46E7-8884-6060B389190F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C25972F5-E344-46E7-8884-6060B389190F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C25972F5-E344-46E7-8884-6060B389190F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AF525F29-AF13-4EC5-8B9C-23EFBD2F45EF} = {A01D711C-54F1-4A8F-8540-7003B91C508E}
+		{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B} = {A01D711C-54F1-4A8F-8540-7003B91C508E}
+		{C25972F5-E344-46E7-8884-6060B389190F} = {179F792A-E1EE-440E-8313-A5ED120E620A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA73EB92-DA65-4108-9D4A-FB432809E6A7}
