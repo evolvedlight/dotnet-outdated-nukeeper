@@ -4,7 +4,7 @@
 name: dotnet nuget build and package
 
 on:
-  [ push ]
+  [ push, pull_request ]
 
 jobs:
   build:
