@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neukeeper", "nuekeeper\neuk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "github", "providers\github\github.csproj", "{AF525F29-AF13-4EC5-8B9C-23EFBD2F45EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shared", "Shared\shared.csproj", "{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shared", "shared\shared.csproj", "{E7A7906E-04D9-4A3A-AA3D-ECC8FEC54B90}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "bitbucket", "providers\bitbucket\bitbucket.csproj", "{BDDC7E65-2F3A-4DE1-A381-015DB63EF78B}"
 EndProject

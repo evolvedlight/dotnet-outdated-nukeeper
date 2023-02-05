@@ -24,7 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\providers\github\github.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\providers\bitbucket\bitbucket.csproj" PrivateAssets="all" />
-    <ProjectReference Include="..\Shared\shared.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\shared\shared.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup>

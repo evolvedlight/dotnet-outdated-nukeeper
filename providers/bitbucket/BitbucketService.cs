@@ -3,9 +3,8 @@ using Atlassian.Stash;
 using Atlassian.Stash.Entities;
 using neukeeper.Models;
 using LibGit2Sharp;
-using LibGit2Sharp.Handlers;
 
-namespace neukeeper.bitbucket
+namespace neukeeper.providers.bitbucket
 {
     public class BitbucketService : ISourceControlService
     {

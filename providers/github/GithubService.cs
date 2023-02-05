@@ -4,7 +4,7 @@ using LibGit2Sharp.Handlers;
 using Octokit;
 using Octokit.Internal;
 
-namespace neukeeper_github
+namespace neukeeper.providers.github
 {
     public class GithubService : ISourceControlService
     {

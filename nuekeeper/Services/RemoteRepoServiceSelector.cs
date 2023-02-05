@@ -1,6 +1,6 @@
 ﻿using neukeeper.Models;
-using neukeeper_github;
-using neukeeper.bitbucket;
+using neukeeper.providers.github;
+using neukeeper.providers.bitbucket;
 using McMaster.Extensions.CommandLineUtils;
 using Octokit;
 

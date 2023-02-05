@@ -1,4 +1,4 @@
-using neukeeper.bitbucket;
+using neukeeper.providers.bitbucket;
 
 namespace neukeeper.test
 {
