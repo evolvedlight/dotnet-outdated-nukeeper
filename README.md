@@ -9,6 +9,7 @@ Supported providers:
 | Provider | Support |
 | -------- | ------- |
 | Github   | :hammer:|
+| Bitbucket Server | :hammer:|
 
 # How to use:
 
