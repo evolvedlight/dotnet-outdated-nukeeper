@@ -25,6 +25,9 @@ namespace DotNetOutdated
     using System.Diagnostics;
     using System.Text;
     using CommunityToolkit.Diagnostics;
+    using System.ComponentModel.DataAnnotations;
+    using static DotNetOutdated.ConsolidatedPackage;
+    using neukeeper.shared;
 
     [Command(
         Name = "dotnet outdated",
@@ -130,6 +133,10 @@ namespace DotNetOutdated
             ShortName = "type", LongName = "repo-type")]
         public RepoType RepoType { get; set; }
 
+        [Option(CommandOptionType.SingleValue, Description = "Max package updates to apply",
+            ShortName = "max", LongName = "max-package-updates")]
+        public int? MaxPackageUpdates { get; set; }
+
         public static int Main(string[] args)
         {
             var services = new ServiceCollection();
@@ -227,13 +234,13 @@ namespace DotNetOutdated
                     ReportOutdatedDependencies(outdatedProjects, console);
 
                     // Upgrade the packages
-                    var success = UpgradePackages(outdatedProjects, console);
+                    var upgradeResult = UpgradePackages(outdatedProjects, console, MaxPackageUpdates);
 
                     if (CreatePr)
                     {
                         var mainBranch = GetMainBranch(path);
-                        var prDetails = CreatePrDetails(outdatedProjects);
-                        var branch = CreateBranch(path, success.Item2, console, prDetails);
+                        var prDetails = CreatePrDetails(upgradeResult);
+                        var branch = CreateBranch(path, upgradeResult, console, prDetails);
                         var pr = await service.CreatePr(ProjectUrl, path, prDetails, mainBranch);
 
                         console.WriteLine($"Create PR: {pr}");
@@ -251,7 +258,7 @@ namespace DotNetOutdated
                     if (FailOnUpdates)
                         return 2;
 
-                    if (!success.Item1)
+                    if (!upgradeResult.Success)
                         return 3;
                 }
                 else
@@ -277,22 +284,20 @@ namespace DotNetOutdated
             return repo.Head.FriendlyName;
         }
 
-        private PrDetails CreatePrDetails(List<AnalyzedProject> outdatedProjects)
+        private PrDetails CreatePrDetails(UpgradeResult upgradeResult)
         {
-            var upgrades = outdatedProjects.ConsolidatePackages();
-
             string? branchName;
             string? title;
-            if (upgrades.Count == 1)
+            if (upgradeResult.UpgradedPackages.Count == 1)
             {
-                var dep = upgrades[0];
+                var dep = upgradeResult.UpgradedPackages[0];
                 branchName = $"outdated/{dep.Name}_{dep.LatestVersion}";
                 title = $"Dotnet-Outdated: Upgrade {dep.Name} to {dep.LatestVersion}";
             }
             else
             {
                 branchName = $"outdated/{DateTime.UtcNow.Ticks}_upgrades";
-                title = $"Dotnet-Outdated: Upgrade {upgrades.Count} packages";
+                title = $"Dotnet-Outdated: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
             }
 
             var body = new StringBuilder();
@@ -301,7 +306,7 @@ namespace DotNetOutdated
             body.AppendLine("| Package | Old Version | New Version |");
             body.AppendLine("| - | - | - |");
 
-            foreach (var upgrade in upgrades)
+            foreach (var upgrade in upgradeResult.UpgradedPackages)
             {
                 body.AppendLine($"| {upgrade.Name} | {upgrade.ResolvedVersion} | {upgrade.LatestVersion} |");
             }
@@ -314,14 +319,14 @@ namespace DotNetOutdated
             );
         }
 
-        private string CreateBranch(string path, List<string> projectPaths, IConsole console, PrDetails prDetails)
+        private string CreateBranch(string path, UpgradeResult upgradeResult, IConsole console, PrDetails prDetails)
         {
             using (var repo = new Repository(path))
             {
                 var branchName = prDetails.BranchName;
                 var branch = repo.CreateBranch(branchName);
                 Remote remote = repo.Network.Remotes["origin"];
-                foreach (var projectPath in projectPaths)
+                foreach (var projectPath in upgradeResult.UpgradedProjects.Select(x => x.ProjectFilePath).Distinct())
                 {
                     var relativePath = Path.GetRelativePath(repo.Info.WorkingDirectory, projectPath);
                     repo.Index.Add(relativePath);
@@ -346,15 +351,21 @@ namespace DotNetOutdated
         }
 
 #nullable disable warnings
-        private (bool, List<string>) UpgradePackages(List<AnalyzedProject> projects, IConsole console)
+        private UpgradeResult UpgradePackages(List<AnalyzedProject> projects, IConsole console, int? maxPackageUpdates)
         {
             bool success = true;
-            var upgradedProjects = new List<string>();
+            var upgradedPackages = new List<ConsolidatedPackage>();
+            var upgradedProjects = new List<PackageProjectReference>();
             if (Upgrade.HasValue)
             {
                 console.WriteLine();
 
                 var consolidatedPackages = projects.ConsolidatePackages();
+
+                if (maxPackageUpdates.HasValue)
+                {
+                    consolidatedPackages = consolidatedPackages.Take(maxPackageUpdates.Value).ToList();
+                }
 
                 foreach (var package in consolidatedPackages)
                 {
@@ -395,7 +406,8 @@ namespace DotNetOutdated
                             {
                                 console.Write($"Project {project.Description} upgraded successfully", Constants.ReporingColors.UpgradeSuccess);
                                 console.WriteLine();
-                                upgradedProjects.Add(project.ProjectFilePath);
+                                upgradedPackages.Add(package);
+                                upgradedProjects.Add(project);
                             }
                             else
                             {
@@ -412,7 +424,7 @@ namespace DotNetOutdated
                 }
             }
 
-            return (success, upgradedProjects);
+            return new UpgradeResult(success, upgradedPackages, upgradedProjects);
         }
 #nullable enable warnings
 
