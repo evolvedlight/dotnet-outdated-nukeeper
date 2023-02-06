@@ -123,7 +123,7 @@ namespace DotNetOutdated
         public string? CommitEmail { get; set; }
 
         [Option(CommandOptionType.SingleOrNoValue, Description = "Github Token (if github used). Also available via \"GITHUB_TOKEN\" environment variable",
-            LongName = "repo_token")]
+            ShortName = "rt", LongName = "repo_token")]
         public string? RepoToken { get; set; }
 
         public static int Main(string[] args)
