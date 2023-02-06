@@ -8,14 +8,14 @@ namespace neukeeper.Services
 {
     public class RemoteRepoServiceSelector : IRemoteRepoServiceSelector
     {
-        public ISourceControlService GetRemoteRepoService(string projectUrl, string username, IReadOnlyCollection<CommandOption> options) => projectUrl switch
+        public ISourceControlService GetRemoteRepoService(string username, IReadOnlyCollection<CommandOption> options, RepoType repoType) => repoType switch
         {
-            var url when url.Contains("github") => GetGithubService(projectUrl, username, options),
-            var url when url.Contains("bitbucket") => GetBitbucketService(projectUrl, username, options),
-            _ => throw new NotImplementedException($"Can't handle projectURL {projectUrl}")
+            RepoType.Github => GetGithubService(username, options),
+            RepoType.BitbucketServer => GetBitbucketService(username, options),
+            _ => throw new NotImplementedException($"Can't handle project type {repoType}")
         };
 
-        private ISourceControlService GetGithubService(string projectUrl, string username, IReadOnlyCollection<CommandOption> options)
+        private ISourceControlService GetGithubService(string username, IReadOnlyCollection<CommandOption> options)
         {
             string? githubToken = null;
             var option = options.SingleOrDefault(o => o.LongName == "token");
@@ -33,7 +33,7 @@ namespace neukeeper.Services
             return new GithubService(username, githubToken);
         }
 
-        private ISourceControlService GetBitbucketService(string projectUrl, string username, IReadOnlyCollection<CommandOption> options)
+        private ISourceControlService GetBitbucketService(string username, IReadOnlyCollection<CommandOption> options)
         {
             string? bitbuckettoken = null;
             var option = options.SingleOrDefault(o => o.LongName == "token");

@@ -123,8 +123,12 @@ namespace DotNetOutdated
         public string? CommitEmail { get; set; }
 
         [Option(CommandOptionType.SingleOrNoValue, Description = "Github Token (if github used). Also available via \"GITHUB_TOKEN\" environment variable",
-            ShortName = "rt", LongName = "repo_token")]
+            ShortName = "rt", LongName = "repo-token")]
         public string? RepoToken { get; set; }
+
+        [Option(CommandOptionType.SingleValue, Description = "Type of source control system",
+            ShortName = "type", LongName = "repo-type")]
+        public RepoType RepoType { get; set; }
 
         public static int Main(string[] args)
         {
@@ -189,7 +193,7 @@ namespace DotNetOutdated
                 Guard.IsNotNull(ProjectUrl, nameof(ProjectUrl));
                 Guard.IsNotNull(Username, nameof(Username));
 
-                var service = _remoteRepoSelector.GetRemoteRepoService(ProjectUrl, Username, app.Options);
+                var service = _remoteRepoSelector.GetRemoteRepoService(Username, app.Options, RepoType);
                 var path = await service.CloneRepo(ProjectUrl);
 
                 // Get all the projects
