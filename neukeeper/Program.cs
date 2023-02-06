@@ -195,7 +195,7 @@ namespace DotNetOutdated
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                console.Write("Checkout out projects...");
+                console.Write("Checking out projects...");
 
                 Guard.IsNotNull(ProjectUrl, nameof(ProjectUrl));
                 Guard.IsNotNull(Username, nameof(Username));
