@@ -1,7 +1,7 @@
 ﻿using DotNetOutdated;
 using static DotNetOutdated.ConsolidatedPackage;
 
-namespace neukeeper.Shared
+namespace neukeeper.shared
 {
     public class UpgradeResult
     {

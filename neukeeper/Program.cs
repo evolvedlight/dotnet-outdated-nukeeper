@@ -27,7 +27,7 @@ namespace DotNetOutdated
     using CommunityToolkit.Diagnostics;
     using System.ComponentModel.DataAnnotations;
     using static DotNetOutdated.ConsolidatedPackage;
-    using neukeeper.Shared;
+    using neukeeper.shared;
 
     [Command(
         Name = "dotnet outdated",
