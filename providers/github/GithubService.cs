@@ -47,7 +47,7 @@ namespace neukeeper.providers.github
             return Task.FromResult(directory);
         }
 
-        public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails)
+        public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails, string mainBranch)
         {
             using (var g2repo = new LibGit2Sharp.Repository(path))
             {

@@ -74,7 +74,7 @@ namespace neukeeper.providers.bitbucket
             return directory;
         }
 
-        public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails)
+        public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails, string mainBranch)
         {
             var repoAndClient = await GetRepoFromUrl(projectUrl);
             var repo = repoAndClient.Item1;
@@ -99,7 +99,7 @@ namespace neukeeper.providers.bitbucket
                     Repository = repo
                 },
                 ToRef = new Ref {
-                    Id = "main",
+                    Id = mainBranch,
                     Repository = repo
                 },
                 State = PullRequestState.OPEN,
