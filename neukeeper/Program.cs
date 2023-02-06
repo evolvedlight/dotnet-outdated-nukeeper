@@ -231,9 +231,10 @@ namespace DotNetOutdated
 
                     if (CreatePr)
                     {
+                        var mainBranch = GetMainBranch(path);
                         var prDetails = CreatePrDetails(outdatedProjects);
                         var branch = CreateBranch(path, success.Item2, console, prDetails);
-                        var pr = await service.CreatePr(ProjectUrl, path, prDetails);
+                        var pr = await service.CreatePr(ProjectUrl, path, prDetails, mainBranch);
 
                         console.WriteLine($"Create PR: {pr}");
                     }
@@ -268,6 +269,12 @@ namespace DotNetOutdated
 
                 return 1;
             }
+        }
+
+        private static string GetMainBranch(string path)
+        {
+            using var repo = new Repository(path);
+            return repo.Head.FriendlyName;
         }
 
         private PrDetails CreatePrDetails(List<AnalyzedProject> outdatedProjects)
