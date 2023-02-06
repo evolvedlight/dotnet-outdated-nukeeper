@@ -16,9 +16,15 @@ Supported providers:
 ## Github:
 Add an environment variable REPO_TOKEN with a PAT for the repo
 Then run:
-`neukeeper https://github.com/evolvedlight/sample-outdated -pr -u --username="evolvedlight" --commitEmail="steve@brown.bg"`
+`neukeeper https://github.com/evolvedlight/sample-outdated  --repo-type="github" -pr -u --username="evolvedlight" --commitEmail="steve@brown.bg"`
 
 ## BitBucket:
 Add an environment variable REPO_TOKEN 
 Then run:
-```neukeeper http://localhost:17990/projects/TEST/repos/sample-outdated/browse -pr -u --username="evo" --commitEmail="steve@brown.bg"```
+```neukeeper http://localhost:17990/projects/TEST/repos/sample-outdated/browse --repo-type="bitbucketserver" -pr -u --username="evo" --commitEmail="steve@brown.bg"```
+
+### Optional Arguments
+
+#### Max packages to update
+
+Use `max-package-updates` to control how many packages to update. For example `max-package-updates=2` will update a maximum of 2 packages
