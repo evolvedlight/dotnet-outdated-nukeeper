@@ -28,6 +28,7 @@ namespace DotNetOutdated
     using System.ComponentModel.DataAnnotations;
     using static DotNetOutdated.ConsolidatedPackage;
     using neukeeper.shared;
+    using System.Linq;
 
     [Command(
         Name = "dotnet outdated",
@@ -133,9 +134,9 @@ namespace DotNetOutdated
             ShortName = "type", LongName = "repo-type")]
         public RepoType RepoType { get; set; }
 
-        [Option(CommandOptionType.SingleValue, Description = "Max package updates to apply",
+        [Option(CommandOptionType.SingleValue, Description = "Max package updates to apply (default 1)",
             ShortName = "max", LongName = "max-package-updates")]
-        public int? MaxPackageUpdates { get; set; }
+        public int? MaxPackageUpdates { get; set; } = 1;
 
         public static int Main(string[] args)
         {
@@ -233,8 +234,10 @@ namespace DotNetOutdated
                     // Report on the outdated dependencies
                     ReportOutdatedDependencies(outdatedProjects, console);
 
+                    var currentUpgradePrs = GetCurrentBranches(path);
+
                     // Upgrade the packages
-                    var upgradeResult = UpgradePackages(outdatedProjects, console, MaxPackageUpdates);
+                    var upgradeResult = UpgradePackages(outdatedProjects, console, MaxPackageUpdates, currentUpgradePrs);
 
                     if (CreatePr)
                     {
@@ -278,6 +281,15 @@ namespace DotNetOutdated
             }
         }
 
+        private List<ExistingBranch> GetCurrentBranches(string path)
+        {
+            using var repo = new Repository(path);
+
+            var allNuekeeperBranches = repo.Branches.Where(b => b.FriendlyName.Contains("/neukeeper/"));
+
+            return allNuekeeperBranches.Select(x => new ExistingBranch(x)).ToList();
+        }
+
         private static string GetMainBranch(string path)
         {
             using var repo = new Repository(path);
@@ -291,12 +303,14 @@ namespace DotNetOutdated
             if (upgradeResult.UpgradedPackages.Count == 1)
             {
                 var dep = upgradeResult.UpgradedPackages[0];
-                branchName = $"outdated/{dep.Name}_{dep.LatestVersion}";
+                branchName = $"neukeeper/upgrade_{dep.Name}_{dep.LatestVersion}";
                 title = $"Neukeeper: Upgrade {dep.Name} to {dep.LatestVersion}";
             }
             else
             {
-                branchName = $"outdated/{DateTime.UtcNow.Ticks}_upgrades";
+                var count = upgradeResult.UpgradedPackages.Count;
+                var hash = upgradeResult.UpgradedPackages.Select(x => x.Name.GetHashCode() + x.Projects.Select(p => p.Project.GetHashCode()).Sum()).Sum() % 397;
+                branchName = $"neukeeper/{count}_upgrades_{hash}";
                 title = $"Neukeeper: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
             }
 
@@ -323,6 +337,12 @@ namespace DotNetOutdated
         {
             using (var repo = new Repository(path))
             {
+                if (repo.Branches.Any(x => x.FriendlyName == prDetails.BranchName))
+                {
+                    console.WriteLine("Branch already exists");
+                    Environment.Exit(0);
+                }
+
                 var branchName = prDetails.BranchName;
                 var branch = repo.CreateBranch(branchName);
                 Remote remote = repo.Network.Remotes["origin"];
@@ -351,7 +371,7 @@ namespace DotNetOutdated
         }
 
 #nullable disable warnings
-        private UpgradeResult UpgradePackages(List<AnalyzedProject> projects, IConsole console, int? maxPackageUpdates)
+        private UpgradeResult UpgradePackages(List<AnalyzedProject> projects, IConsole console, int? maxPackageUpdates, List<ExistingBranch> currentUpgradePrs)
         {
             bool success = true;
             var upgradedPackages = new List<ConsolidatedPackage>();
@@ -362,12 +382,28 @@ namespace DotNetOutdated
 
                 var consolidatedPackages = projects.ConsolidatePackages();
 
-                if (maxPackageUpdates.HasValue)
+                
+
+                var consolidatedPackagesNotYetUpgraded = new List<ConsolidatedPackage>();
+                foreach (var consolidatedPackage in consolidatedPackages)
                 {
-                    consolidatedPackages = consolidatedPackages.Take(maxPackageUpdates.Value).ToList();
+                    var existing = currentUpgradePrs.Where(pr => pr.UpgradedPackages.Any(p => p.Package == consolidatedPackage.Name && p.Version == consolidatedPackage.LatestVersion.OriginalVersion)).ToList();
+                    if (existing.Any())
+                    {
+                        console.WriteLine($"There is already a branch for {consolidatedPackage.Name}@{consolidatedPackage.LatestVersion.OriginalVersion}");
+                    }
+                    else
+                    {
+                        consolidatedPackagesNotYetUpgraded.Add(consolidatedPackage);
+                    }
                 }
 
-                foreach (var package in consolidatedPackages)
+                if (maxPackageUpdates.HasValue)
+                {
+                    consolidatedPackagesNotYetUpgraded = consolidatedPackagesNotYetUpgraded.Take(maxPackageUpdates.Value).ToList();
+                }
+
+                foreach (var package in consolidatedPackagesNotYetUpgraded)
                 {
                     bool upgrade = true;
 
