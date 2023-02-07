@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "dotnet-outdated-nukeeper": {
+    "neukeeper": {
       "commandName": "Project",
       "commandLineArgs": "https://github.com/evolvedlight/sample-outdated -pr -u --username=\"evolvedlight\" --commitEmail=\"steve@brown.bg\""
     }

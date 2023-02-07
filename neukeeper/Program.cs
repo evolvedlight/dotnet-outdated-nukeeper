@@ -292,12 +292,12 @@ namespace DotNetOutdated
             {
                 var dep = upgradeResult.UpgradedPackages[0];
                 branchName = $"outdated/{dep.Name}_{dep.LatestVersion}";
-                title = $"Dotnet-Outdated: Upgrade {dep.Name} to {dep.LatestVersion}";
+                title = $"Neukeeper: Upgrade {dep.Name} to {dep.LatestVersion}";
             }
             else
             {
                 branchName = $"outdated/{DateTime.UtcNow.Ticks}_upgrades";
-                title = $"Dotnet-Outdated: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
+                title = $"Neukeeper: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
             }
 
             var body = new StringBuilder();
