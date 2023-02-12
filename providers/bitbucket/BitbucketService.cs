@@ -86,6 +86,8 @@ namespace neukeeper.providers.bitbucket
 
                 g2repo.Network.Push(g2repo.Branches[prDetails.BranchName], options);
             }
+
+            var defaultReviewers = await GetDefaultReviewers(client, repo, prDetails, mainBranch);
             
             var newPullRequest = new PullRequest {
                 Title = prDetails.Title,
@@ -103,11 +105,23 @@ namespace neukeeper.providers.bitbucket
                     Repository = repo
                 },
                 State = PullRequestState.OPEN,
-                Description = prDetails.BodyMarkdown
+                Description = prDetails.BodyMarkdown,
+                Reviewers = defaultReviewers.ToArray()
             };
 
             var pr = await client.PullRequests.Create(repo.Project.Key, repo.Slug, newPullRequest);
             return pr.Links.Self.First().Href.ToString();
+        }
+
+        private const string ApiReviewersPath = @"rest/default-reviewers/1.0";
+        public async Task<List<AuthorWrapper>> GetDefaultReviewers(StashClient client, Atlassian.Stash.Entities.Repository repo, PrDetails prDetails, string mainBranch) 
+        {
+            // hacky, yes
+            var httpCommunication =  client.GetHttpWorker();
+
+            var url = $@"{ApiReviewersPath}/projects/{repo.Project.Name}/repos/{repo.Slug}/reviewers?sourceRepoId={repo.Id}&targetRepoId={repo.Id}&sourceRefId={mainBranch}&targetRefId={prDetails.BranchName}";
+            var audience = await httpCommunication.GetAsync<List<Author>>($@"{ApiReviewersPath}/projects/{repo.Project.Name}/repos/{repo.Slug}/reviewers?sourceRepoId={repo.Id}&targetRepoId={repo.Id}&sourceRefId={prDetails.BranchName}&targetRefId={mainBranch}");
+            return audience.Where(r => r.Active).Select(user => new AuthorWrapper { User = user }).ToList();
         }
 
         public static string GetTemporaryDirectory()
