@@ -119,8 +119,8 @@ namespace neukeeper.providers.bitbucket
             // hacky, yes
             var httpCommunication =  client.GetHttpWorker();
 
-            var url = $@"{ApiReviewersPath}/projects/{repo.Project.Name}/repos/{repo.Slug}/reviewers?sourceRepoId={repo.Id}&targetRepoId={repo.Id}&sourceRefId={mainBranch}&targetRefId={prDetails.BranchName}";
-            var audience = await httpCommunication.GetAsync<List<Author>>($@"{ApiReviewersPath}/projects/{repo.Project.Name}/repos/{repo.Slug}/reviewers?sourceRepoId={repo.Id}&targetRepoId={repo.Id}&sourceRefId={prDetails.BranchName}&targetRefId={mainBranch}");
+            var url = $@"{ApiReviewersPath}/projects/{repo.Project.Key}/repos/{repo.Slug}/reviewers?sourceRepoId={repo.Id}&targetRepoId={repo.Id}&sourceRefId={prDetails.BranchName}&targetRefId={mainBranch}";
+            var audience = await httpCommunication.GetAsync<List<Author>>(url);
             return audience.Where(r => r.Active).Select(user => new AuthorWrapper { User = user }).ToList();
         }
 
