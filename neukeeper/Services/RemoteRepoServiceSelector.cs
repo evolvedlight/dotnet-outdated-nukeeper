@@ -2,29 +2,23 @@
 using neukeeper.providers.github;
 using neukeeper.providers.bitbucket;
 using McMaster.Extensions.CommandLineUtils;
-using Octokit;
 
 namespace neukeeper.Services
 {
     public class RemoteRepoServiceSelector : IRemoteRepoServiceSelector
     {
-        public ISourceControlService GetRemoteRepoService(string username, IReadOnlyCollection<CommandOption> options, RepoType repoType) => repoType switch
+        public ISourceControlService GetRemoteRepoService(string username, IReadOnlyCollection<CommandOption> options, RepoType repoType, string? repoToken) => repoType switch
         {
-            RepoType.Github => GetGithubService(username, options),
-            RepoType.BitbucketServer => GetBitbucketService(username, options),
+            RepoType.Github => GetGithubService(username, options, repoToken),
+            RepoType.BitbucketServer => GetBitbucketService(username, options, repoToken),
             _ => throw new NotImplementedException($"Can't handle project type {repoType}")
         };
 
-        private ISourceControlService GetGithubService(string username, IReadOnlyCollection<CommandOption> options)
+        private ISourceControlService GetGithubService(string username, IReadOnlyCollection<CommandOption> options, string? repoToken)
         {
-            string? githubToken = null;
-            var option = options.SingleOrDefault(o => o.LongName == "token");
-            if (option?.HasValue() == true)
-            {
-                githubToken = option.Value();
-            }
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN"))) {
-                githubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+            var githubToken = repoToken;
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("REPO_TOKEN"))) {
+                githubToken = Environment.GetEnvironmentVariable("REPO_TOKEN");
             }
             if (string.IsNullOrEmpty(githubToken))
             {
@@ -33,14 +27,9 @@ namespace neukeeper.Services
             return new GithubService(username, githubToken);
         }
 
-        private ISourceControlService GetBitbucketService(string username, IReadOnlyCollection<CommandOption> options)
+        private ISourceControlService GetBitbucketService(string username, IReadOnlyCollection<CommandOption> options, string? repoToken)
         {
-            string? bitbuckettoken = null;
-            var option = options.SingleOrDefault(o => o.LongName == "token");
-            if (option?.HasValue() == true)
-            {
-                bitbuckettoken = option.Value();
-            }
+            var bitbuckettoken = repoToken;
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("REPO_TOKEN"))) {
                 bitbuckettoken = Environment.GetEnvironmentVariable("REPO_TOKEN");
             }
