@@ -18,7 +18,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet pack neukeeper/neukeeper.csproj -c release -p:PackageVersion=0.0.${{github.run_number}} --output nupkgs
+      run: dotnet pack neukeeper/neukeeper.csproj -c release -p:PackageVersion=0.0.${{github.run_number}} --output nupkgs /p:Version=0.0.${{github.run_number}}
     - name: Upload nuget
       uses: actions/upload-artifact@v3
       with:
