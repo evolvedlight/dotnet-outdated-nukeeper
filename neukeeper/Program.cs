@@ -50,7 +50,8 @@ namespace DotNetOutdated
         public bool IncludeAutoReferences { get; set; } = false;
 
         [Argument(0, Description = "The project URL")]
-        public string? ProjectUrl { get; set; }
+        [Required]
+        public string ProjectUrl { get; set; }
 
         [Option(CommandOptionType.SingleValue, Description = "Specifies whether to look for pre-release versions of packages. " +
                                                              "Possible values: Auto (default), Always or Never.",
@@ -196,13 +197,21 @@ namespace DotNetOutdated
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                console.Write("Checking out projects...");
-
-                Guard.IsNotNull(ProjectUrl, nameof(ProjectUrl));
+                Guard.IsNotNullOrWhiteSpace(ProjectUrl, nameof(ProjectUrl));
                 Guard.IsNotNull(Username, nameof(Username));
 
+                if (RepoType == RepoType.NotSet)
+                {
+                    console.Error.WriteLine("Repo Type must be provided");
+                    app.ShowHelp();
+                    return -1;
+                }
+
+                console.Write("Checking out projects...");
                 var service = _remoteRepoSelector.GetRemoteRepoService(Username, app.Options, RepoType, RepoToken);
                 var path = await service.CloneRepo(ProjectUrl);
+
+                
 
                 // Get all the projects
                 console.Write("Discovering projects...");
