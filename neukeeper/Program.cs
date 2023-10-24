@@ -173,7 +173,6 @@ namespace DotNetOutdated
         public static string GetVersion()
         {
             var versionAssembly = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-
             Guard.IsNotNull(versionAssembly, nameof(versionAssembly));
             return versionAssembly.InformationalVersion;
         }
@@ -255,7 +254,7 @@ namespace DotNetOutdated
                         var branch = CreateBranch(path, upgradeResult, console, prDetails);
                         var pr = await service.CreatePr(ProjectUrl, path, prDetails, mainBranch);
 
-                        console.WriteLine($"Create PR: {pr}");
+                        console.WriteLine($"Create PR: {pr} on branch {branch}");
                     }
 
                     if (!Upgrade.HasValue)
@@ -290,7 +289,7 @@ namespace DotNetOutdated
             }
         }
 
-        private List<ExistingBranch> GetCurrentBranches(string path)
+        private static List<ExistingBranch> GetCurrentBranches(string path)
         {
             using var repo = new Repository(path);
 
@@ -305,7 +304,7 @@ namespace DotNetOutdated
             return repo.Head.FriendlyName;
         }
 
-        private PrDetails CreatePrDetails(UpgradeResult upgradeResult)
+        private static PrDetails CreatePrDetails(UpgradeResult upgradeResult)
         {
             string? branchName;
             string? title;
@@ -375,7 +374,7 @@ namespace DotNetOutdated
 
                 // Commit to the repository
                 Commands.Checkout(repo, branch);
-                Commit commit = repo.Commit(prDetails.Title, author, committer);
+                repo.Commit(prDetails.Title, author, committer);
 
                 repo.Branches.Update(branch,
                 b => b.Remote = remote.Name,
@@ -402,7 +401,7 @@ namespace DotNetOutdated
                 var consolidatedPackagesNotYetUpgraded = new List<ConsolidatedPackage>();
                 foreach (var consolidatedPackage in consolidatedPackages)
                 {
-                    var existing = currentUpgradePrs.Where(pr => pr.UpgradedPackages.Any(p => p.Package == consolidatedPackage.Name && p.Version == consolidatedPackage.LatestVersion.OriginalVersion)).ToList();
+                    var existing = currentUpgradePrs.Where(pr => pr.UpgradedPackages.Exists(p => p.Package == consolidatedPackage.Name && p.Version == consolidatedPackage.LatestVersion.OriginalVersion)).ToList();
                     if (existing.Any())
                     {
                         console.WriteLine($"There is already a branch for {consolidatedPackage.Name}@{consolidatedPackage.LatestVersion.OriginalVersion}");
@@ -479,7 +478,7 @@ namespace DotNetOutdated
         }
 #nullable enable warnings
 
-        private void PrintColorLegend(IConsole console)
+        private static void PrintColorLegend(IConsole console)
         {
             console.WriteLine("Version color legend:");
 
@@ -527,7 +526,7 @@ namespace DotNetOutdated
         }
 
 #nullable disable warnings
-        private void ReportOutdatedDependencies(List<AnalyzedProject> projects, IConsole console)
+        private static void ReportOutdatedDependencies(List<AnalyzedProject> projects, IConsole console)
         {
             foreach (var project in projects)
             {
@@ -588,7 +587,7 @@ namespace DotNetOutdated
             for (var index = 0; index < projects.Count; index++)
             {
                 var project = projects[index];
-                tasks[index] = AddOutdatedProjectsIfNeeded(project, outdatedProjects, console);
+                tasks[index] = AddOutdatedProjectsIfNeeded(project, outdatedProjects);
             }
 
             await Task.WhenAll(tasks);
@@ -602,15 +601,15 @@ namespace DotNetOutdated
         }
 
         private bool AnyIncludeFilterMatches(Dependency dep) =>
-            FilterInclude.Any(f => NameContains(dep, f));
+            FilterInclude.Exists(f => NameContains(dep, f));
 
         private bool NoExcludeFilterMatches(Dependency dep) =>
-            !FilterExclude.Any(f => NameContains(dep, f));
+            !FilterExclude.Exists(f => NameContains(dep, f));
 
-        private bool NameContains(Dependency dep, string part) =>
+        private static bool NameContains(Dependency dep, string part) =>
             dep.Name.Contains(part, StringComparison.InvariantCultureIgnoreCase);
 
-        private async Task AddOutdatedProjectsIfNeeded(Project project, ConcurrentBag<AnalyzedProject> outdatedProjects, IConsole console)
+        private async Task AddOutdatedProjectsIfNeeded(Project project, ConcurrentBag<AnalyzedProject> outdatedProjects)
         {
             var outdatedFrameworks = new ConcurrentBag<AnalyzedTargetFramework>();
 
@@ -620,20 +619,20 @@ namespace DotNetOutdated
             for (var index = 0; index < project.TargetFrameworks.Count; index++)
             {
                 var targetFramework = project.TargetFrameworks[index];
-                tasks[index] = AddOutdatedFrameworkIfNeeded(targetFramework, project, outdatedFrameworks, console);
+                tasks[index] = AddOutdatedFrameworkIfNeeded(targetFramework, project, outdatedFrameworks);
             }
 
             await Task.WhenAll(tasks);
 
-            if (outdatedFrameworks.Count > 0)
+            if (!outdatedFrameworks.IsEmpty)
                 outdatedProjects.Add(new AnalyzedProject(project.Name, project.FilePath, outdatedFrameworks));
         }
 
-        private async Task AddOutdatedFrameworkIfNeeded(TargetFramework targetFramework, Project project, ConcurrentBag<AnalyzedTargetFramework> outdatedFrameworks, IConsole console)
+        private async Task AddOutdatedFrameworkIfNeeded(TargetFramework targetFramework, Project project, ConcurrentBag<AnalyzedTargetFramework> outdatedFrameworks)
         {
             var outdatedDependencies = new ConcurrentBag<AnalyzedDependency>();
 
-            var deps = targetFramework.Dependencies.Where(d => this.IncludeAutoReferences || d.IsAutoReferenced == false);
+            var deps = targetFramework.Dependencies.Where(d => this.IncludeAutoReferences || !d.IsAutoReferenced);
 
             if (FilterInclude.Any())
                 deps = deps.Where(AnyIncludeFilterMatches);
@@ -656,7 +655,7 @@ namespace DotNetOutdated
 
             await Task.WhenAll(tasks);
 
-            if (outdatedDependencies.Count > 0)
+            if (!outdatedDependencies.IsEmpty)
                 outdatedFrameworks.Add(new AnalyzedTargetFramework(targetFramework.Name, outdatedDependencies));
         }
 
