@@ -52,7 +52,6 @@ namespace neukeeper.providers.bitbucket
             var repo = repoAndClient.Repository;
             var directory = GetTemporaryDirectory();
             var co = new CloneOptions();
-            var cloneUrl = repo.CloneUrl;
 
             co.FetchOptions = new FetchOptions {
                 CustomHeaders = new string[] { $"Authorization: Bearer {_token}" }

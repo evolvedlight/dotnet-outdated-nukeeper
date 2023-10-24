@@ -174,7 +174,6 @@ namespace DotNetOutdated
         {
             var versionAssembly = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
 
-            Guard.IsNotNull(versionAssembly, nameof(versionAssembly));
             return versionAssembly.InformationalVersion;
         }
 
@@ -255,7 +254,7 @@ namespace DotNetOutdated
                         var branch = CreateBranch(path, upgradeResult, console, prDetails);
                         var pr = await service.CreatePr(ProjectUrl, path, prDetails, mainBranch);
 
-                        console.WriteLine($"Create PR: {pr}");
+                        console.WriteLine($"Create PR: {pr} on branch {branch}");
                     }
 
                     if (!Upgrade.HasValue)
@@ -375,7 +374,7 @@ namespace DotNetOutdated
 
                 // Commit to the repository
                 Commands.Checkout(repo, branch);
-                Commit commit = repo.Commit(prDetails.Title, author, committer);
+                repo.Commit(prDetails.Title, author, committer);
 
                 repo.Branches.Update(branch,
                 b => b.Remote = remote.Name,
@@ -620,7 +619,7 @@ namespace DotNetOutdated
             for (var index = 0; index < project.TargetFrameworks.Count; index++)
             {
                 var targetFramework = project.TargetFrameworks[index];
-                tasks[index] = AddOutdatedFrameworkIfNeeded(targetFramework, project, outdatedFrameworks, console);
+                tasks[index] = AddOutdatedFrameworkIfNeeded(targetFramework, project, outdatedFrameworks);
             }
 
             await Task.WhenAll(tasks);
@@ -629,11 +628,11 @@ namespace DotNetOutdated
                 outdatedProjects.Add(new AnalyzedProject(project.Name, project.FilePath, outdatedFrameworks));
         }
 
-        private async Task AddOutdatedFrameworkIfNeeded(TargetFramework targetFramework, Project project, ConcurrentBag<AnalyzedTargetFramework> outdatedFrameworks, IConsole console)
+        private async Task AddOutdatedFrameworkIfNeeded(TargetFramework targetFramework, Project project, ConcurrentBag<AnalyzedTargetFramework> outdatedFrameworks)
         {
             var outdatedDependencies = new ConcurrentBag<AnalyzedDependency>();
 
-            var deps = targetFramework.Dependencies.Where(d => this.IncludeAutoReferences || d.IsAutoReferenced == false);
+            var deps = targetFramework.Dependencies.Where(d => this.IncludeAutoReferences || !d.IsAutoReferenced);
 
             if (FilterInclude.Any())
                 deps = deps.Where(AnyIncludeFilterMatches);

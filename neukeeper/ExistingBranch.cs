@@ -6,7 +6,6 @@ namespace DotNetOutdated
     internal partial class ExistingBranch
     {
         private static Regex singleUpgradeRegex = SingleUpgradeRegex();
-        private static Regex multiUpgradeRegex = MultiUpgradeRegex();
 
         public List<PackageAndVersion> UpgradedPackages { get; }
 
