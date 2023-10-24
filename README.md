@@ -11,7 +11,7 @@ Supported providers:
 | Github   | :hammer:|
 | Bitbucket Server | :hammer:|
 
-![Example Execution](docs/images/terminal.png)
+![Example Execution](https://raw.githubusercontent.com/evolvedlight/neukeeper/latest/docs/images/terminal.png)
 
 Example pull request: https://github.com/evolvedlight/sample-outdated/pull/23
 
