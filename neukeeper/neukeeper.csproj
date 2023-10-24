@@ -1,14 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Product>neukeeper</Product>
+    <Title>neukeeper</Title>
+    <Description>Dotnet tool for updating dependencies automatically</Description>
+    <Authors>Stephen Brown</Authors>
+    <RepositoryUrl>https://github.com/evolvedlight/neukeeper</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/evolvedlight/neukeeper</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSource>true</IncludeSource>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>neukeeper</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<PackageOutputPath>./nupkg</PackageOutputPath>
-	<ToolCommandName>neukeeper</ToolCommandName>
-	<PackAsTool>true</PackAsTool>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <ToolCommandName>neukeeper</ToolCommandName>
+    <PackAsTool>true</PackAsTool>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,5 +44,17 @@
   <PropertyGroup>
     <NoProjectBuildInPackageWelcome>false</NoProjectBuildInPackageWelcome>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
