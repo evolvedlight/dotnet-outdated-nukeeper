@@ -1,5 +1,7 @@
 # Neukeeper
 
+![Nuget version neukeeper](https://img.shields.io/nuget/v/neukeeper)
+
 This is a reimplementation of Nukeeper using dotnet-outdated underneath.
 
 *This project is still under development and doesn't yet support full functionality*
