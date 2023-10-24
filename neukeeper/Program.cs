@@ -587,7 +587,7 @@ namespace DotNetOutdated
             for (var index = 0; index < projects.Count; index++)
             {
                 var project = projects[index];
-                tasks[index] = AddOutdatedProjectsIfNeeded(project, outdatedProjects, console);
+                tasks[index] = AddOutdatedProjectsIfNeeded(project, outdatedProjects);
             }
 
             await Task.WhenAll(tasks);
@@ -609,7 +609,7 @@ namespace DotNetOutdated
         private bool NameContains(Dependency dep, string part) =>
             dep.Name.Contains(part, StringComparison.InvariantCultureIgnoreCase);
 
-        private async Task AddOutdatedProjectsIfNeeded(Project project, ConcurrentBag<AnalyzedProject> outdatedProjects, IConsole console)
+        private async Task AddOutdatedProjectsIfNeeded(Project project, ConcurrentBag<AnalyzedProject> outdatedProjects)
         {
             var outdatedFrameworks = new ConcurrentBag<AnalyzedTargetFramework>();
 
