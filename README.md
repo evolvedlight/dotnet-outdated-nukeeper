@@ -11,17 +11,29 @@ Supported providers:
 | Github   | :hammer:|
 | Bitbucket Server | :hammer:|
 
+![Example Execution](docs/images/terminal.png)
+
+Example pull request: https://github.com/evolvedlight/sample-outdated/pull/23
+
 # How to use:
+
+```
+dotnet tool install --global neukeeper
+```
 
 ## Github:
 Add an environment variable REPO_TOKEN with a PAT for the repo
 Then run:
-`neukeeper https://github.com/evolvedlight/sample-outdated  --repo-type="Github" -pr -u --username="evolvedlight" --commitEmail="steve@brown.bg"`
+```bash
+neukeeper https://github.com/evolvedlight/sample-outdated  --repo-type="Github" -pr -u --username="evolvedlight" --commitEmail="steve@brown.bg"
+```
 
 ## BitBucket:
 Add an environment variable REPO_TOKEN 
 Then run:
-```neukeeper http://localhost:17990/projects/TEST/repos/sample-outdated/browse --repo-type="BitbucketServer" -pr -u --username="evo" --commitEmail="steve@brown.bg"```
+```bash
+neukeeper http://localhost:17990/projects/TEST/repos/sample-outdated/browse --repo-type="BitbucketServer" -pr -u --username="evo" --commitEmail="steve@brown.bg"
+```
 
 ### Optional Arguments
 
