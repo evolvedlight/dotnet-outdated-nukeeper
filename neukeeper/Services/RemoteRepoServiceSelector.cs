@@ -35,7 +35,7 @@ namespace neukeeper.Services
             }
             if (string.IsNullOrEmpty(bitbuckettoken))
             {
-                throw new ArgumentNullException(nameof(bitbuckettoken), "Need bitbucket token passed via command line or environment variable");
+                throw new ArgumentNullException(nameof(repoToken), "Need bitbucket token passed via command line or environment variable REPO_TOKEN");
             }
             return new BitbucketService(username, bitbuckettoken);
         }
