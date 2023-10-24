@@ -26,16 +26,6 @@ namespace neukeeper.providers.bitbucket
             _token = token;
         }
 
-        private UsernamePasswordCredentials Credentials { get
-            {
-                return new UsernamePasswordCredentials()
-                {
-                    Username = _username,
-                    Password = _token
-                };
-            } 
-        }
-
         public BitbucketRepoDetails GetRepoDetailsFromUrl(string projectUrl) 
         {
             var regex = new Regex(@"(?<basePath>https?:\/\/.*)\/(projects|users)\/(?<projectName>[^\/]*)\/repos\/(?<repoName>[^\/]*)\/browse");
@@ -49,18 +39,17 @@ namespace neukeeper.providers.bitbucket
             };
         }
 
-        public async Task<(Atlassian.Stash.Entities.Repository, StashClient)> GetRepoFromUrl(string projectUrl) {
+        public async Task<(Atlassian.Stash.Entities.Repository Repository, StashClient Client)> GetRepoFromUrl(string projectUrl) {
             var details = GetRepoDetailsFromUrl(projectUrl);
             
             var client = new StashClient(details.BasePath, _token, true);
-            var repo = await client.Repositories.GetById(details.Project, details.RepoSlug);
             return (await client.Repositories.GetById(details.Project, details.RepoSlug), client);
         }
 
         public async Task<string> CloneRepo(string projectUrl)
         {
             var repoAndClient = await GetRepoFromUrl(projectUrl);
-            var repo = repoAndClient.Item1;
+            var repo = repoAndClient.Repository;
             var directory = GetTemporaryDirectory();
             var co = new CloneOptions();
             var cloneUrl = repo.CloneUrl;
@@ -77,8 +66,8 @@ namespace neukeeper.providers.bitbucket
         public async Task<string> CreatePr(string projectUrl, string path, PrDetails prDetails, string mainBranch)
         {
             var repoAndClient = await GetRepoFromUrl(projectUrl);
-            var repo = repoAndClient.Item1;
-            var client = repoAndClient.Item2;
+            var repo = repoAndClient.Repository;
+            var client = repoAndClient.Client;
             using (var g2repo = new LibGit2Sharp.Repository(path))
             {
                 PushOptions options = new();
@@ -129,22 +118,6 @@ namespace neukeeper.providers.bitbucket
             var tempDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());
             Directory.CreateDirectory(tempDirectory);
             return tempDirectory;
-        }
-    }
-
-    public class BitbucketRepoDetails
-    {
-        public string? Project { get; set; }
-        public string? User { get; set; }
-        public string RepoSlug { get; set; }
-        public string BasePath { get; internal set; }
-
-        public BitbucketRepoDetails(string basePath, string repoSlug, string? project = null, string? user = null)
-        {
-            BasePath = basePath;
-            RepoSlug = repoSlug;
-            Project = project;
-            User = user;
         }
     }
 }

@@ -21,6 +21,8 @@
     <ToolCommandName>neukeeper</ToolCommandName>
     <PackAsTool>true</PackAsTool>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
