@@ -3,6 +3,11 @@
 
 name: dotnet nuget build and package
 
+permissions:
+  contents: "write"
+  packages: "write"
+  pull-requests: "read"
+
 on:
   [ push, pull_request ]
 
