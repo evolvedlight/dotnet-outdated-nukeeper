@@ -60,3 +60,11 @@ jobs:
       run: |
         ls
         dotnet nuget push *.nupkg --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
+    - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Release 0.0.${{github.run_number}}"
+          files: |
+            *.nupkg
