@@ -51,7 +51,7 @@ namespace DotNetOutdated
 
         [Argument(0, Description = "The project URL")]
         [Required]
-        public string ProjectUrl { get; set; }
+        public string? ProjectUrl { get; set; }
 
         [Option(CommandOptionType.SingleValue, Description = "Specifies whether to look for pre-release versions of packages. " +
                                                              "Possible values: Auto (default), Always or Never.",
@@ -318,7 +318,7 @@ namespace DotNetOutdated
             else
             {
                 var count = upgradeResult.UpgradedPackages.Count;
-                var hash = upgradeResult.UpgradedPackages.Select(x => x.Name.GetHashCode() + x.Projects.Select(p => p.Project.GetHashCode()).Sum()).Aggregate((a, b) => unchecked(a + b)) % 397;
+                var hash = upgradeResult.UpgradedPackages.Select(x => x.Name?.GetHashCode() + x.Projects?.Select(p => p.Project?.GetHashCode()).Sum()).Aggregate((a, b) => unchecked(a + b)) % 397;
                 branchName = $"neukeeper/{count}_upgrades_{hash}";
                 title = $"Neukeeper: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
             }
@@ -357,6 +357,12 @@ namespace DotNetOutdated
                 Remote remote = repo.Network.Remotes["origin"];
                 foreach (var projectPath in upgradeResult.UpgradedProjects.Select(x => x.ProjectFilePath).Distinct())
                 {
+                    if (string.IsNullOrEmpty(projectPath))
+                    {
+                        // should not happen
+                        continue;
+                    }
+
                     var relativePath = Path.GetRelativePath(repo.Info.WorkingDirectory, projectPath);
                     repo.Index.Add(relativePath);
                     console.WriteLine($"Added {relativePath} to branch");
@@ -673,7 +679,7 @@ namespace DotNetOutdated
                     NuGetVersion absoluteLatestVersion = await _nugetService.ResolvePackageVersions(dependency.Name, referencedVersion, project.Sources, dependency.VersionRange,
                         VersionLock, Prerelease, targetFramework.Name, project.FilePath, dependency.IsDevelopmentDependency);
 
-                    if (absoluteLatestVersion == null || referencedVersion > absoluteLatestVersion)
+                    if (referencedVersion!= null && (absoluteLatestVersion == null || referencedVersion > absoluteLatestVersion))
                     {
                         outdatedDependencies.Add(new AnalyzedDependency(dependency, latestVersion));
                     }
