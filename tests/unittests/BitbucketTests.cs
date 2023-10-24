@@ -9,7 +9,7 @@ namespace neukeeper.test
         {
             var service = new BitbucketService("test", "test");
 
-            var details = service.GetRepoDetailsFromUrl("https://bitbucket.xx.com/users/test/repos/projectNameIsThis/browse");
+            var details = BitbucketService.GetRepoDetailsFromUrl("https://bitbucket.xx.com/users/test/repos/projectNameIsThis/browse");
 
             Assert.Equal("projectNameIsThis", details.RepoSlug);
             Assert.Equal("test", details.Project);

@@ -6,7 +6,7 @@ using LibGit2Sharp;
 
 namespace neukeeper.providers.bitbucket
 {
-    public class BitbucketService : ISourceControlService
+    public partial class BitbucketService : ISourceControlService
     {
         private readonly string _username;
         private readonly string _token;
@@ -26,9 +26,9 @@ namespace neukeeper.providers.bitbucket
             _token = token;
         }
 
-        public BitbucketRepoDetails GetRepoDetailsFromUrl(string projectUrl) 
+        public static BitbucketRepoDetails GetRepoDetailsFromUrl(string projectUrl) 
         {
-            var regex = new Regex(@"(?<basePath>https?:\/\/.*)\/(projects|users)\/(?<projectName>[^\/]*)\/repos\/(?<repoName>[^\/]*)\/browse");
+            var regex = BitbucketPathMatchingRegex();
             var match = regex.Match(projectUrl);
             if (!match.Success) {
                 throw new ArgumentException($"Couldn't parse url {projectUrl}");
@@ -98,11 +98,11 @@ namespace neukeeper.providers.bitbucket
             };
 
             var pr = await client.PullRequests.Create(repo.Project.Key, repo.Slug, newPullRequest);
-            return pr.Links.Self.First().Href.ToString();
+            return pr.Links.Self[0].Href.ToString();
         }
 
         private const string ApiReviewersPath = @"rest/default-reviewers/1.0";
-        public async Task<List<AuthorWrapper>> GetDefaultReviewers(StashClient client, Atlassian.Stash.Entities.Repository repo, PrDetails prDetails, string mainBranch) 
+        public static async Task<List<AuthorWrapper>> GetDefaultReviewers(StashClient client, Atlassian.Stash.Entities.Repository repo, PrDetails prDetails, string mainBranch) 
         {
             // hacky, yes
             var httpCommunication =  client.GetHttpWorker();
@@ -118,5 +118,8 @@ namespace neukeeper.providers.bitbucket
             Directory.CreateDirectory(tempDirectory);
             return tempDirectory;
         }
+
+        [GeneratedRegex("(?<basePath>https?:\\/\\/.*)\\/(projects|users)\\/(?<projectName>[^\\/]*)\\/repos\\/(?<repoName>[^\\/]*)\\/browse")]
+        private static partial Regex BitbucketPathMatchingRegex();
     }
 }

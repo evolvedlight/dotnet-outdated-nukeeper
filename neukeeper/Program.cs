@@ -173,7 +173,7 @@ namespace DotNetOutdated
         public static string GetVersion()
         {
             var versionAssembly = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-
+            Guard.IsNotNull(versionAssembly, nameof(versionAssembly));
             return versionAssembly.InformationalVersion;
         }
 
@@ -289,7 +289,7 @@ namespace DotNetOutdated
             }
         }
 
-        private List<ExistingBranch> GetCurrentBranches(string path)
+        private static List<ExistingBranch> GetCurrentBranches(string path)
         {
             using var repo = new Repository(path);
 
@@ -304,7 +304,7 @@ namespace DotNetOutdated
             return repo.Head.FriendlyName;
         }
 
-        private PrDetails CreatePrDetails(UpgradeResult upgradeResult)
+        private static PrDetails CreatePrDetails(UpgradeResult upgradeResult)
         {
             string? branchName;
             string? title;
@@ -401,7 +401,7 @@ namespace DotNetOutdated
                 var consolidatedPackagesNotYetUpgraded = new List<ConsolidatedPackage>();
                 foreach (var consolidatedPackage in consolidatedPackages)
                 {
-                    var existing = currentUpgradePrs.Where(pr => pr.UpgradedPackages.Any(p => p.Package == consolidatedPackage.Name && p.Version == consolidatedPackage.LatestVersion.OriginalVersion)).ToList();
+                    var existing = currentUpgradePrs.Where(pr => pr.UpgradedPackages.Exists(p => p.Package == consolidatedPackage.Name && p.Version == consolidatedPackage.LatestVersion.OriginalVersion)).ToList();
                     if (existing.Any())
                     {
                         console.WriteLine($"There is already a branch for {consolidatedPackage.Name}@{consolidatedPackage.LatestVersion.OriginalVersion}");
@@ -478,7 +478,7 @@ namespace DotNetOutdated
         }
 #nullable enable warnings
 
-        private void PrintColorLegend(IConsole console)
+        private static void PrintColorLegend(IConsole console)
         {
             console.WriteLine("Version color legend:");
 
@@ -526,7 +526,7 @@ namespace DotNetOutdated
         }
 
 #nullable disable warnings
-        private void ReportOutdatedDependencies(List<AnalyzedProject> projects, IConsole console)
+        private static void ReportOutdatedDependencies(List<AnalyzedProject> projects, IConsole console)
         {
             foreach (var project in projects)
             {
@@ -601,12 +601,12 @@ namespace DotNetOutdated
         }
 
         private bool AnyIncludeFilterMatches(Dependency dep) =>
-            FilterInclude.Any(f => NameContains(dep, f));
+            FilterInclude.Exists(f => NameContains(dep, f));
 
         private bool NoExcludeFilterMatches(Dependency dep) =>
-            !FilterExclude.Any(f => NameContains(dep, f));
+            !FilterExclude.Exists(f => NameContains(dep, f));
 
-        private bool NameContains(Dependency dep, string part) =>
+        private static bool NameContains(Dependency dep, string part) =>
             dep.Name.Contains(part, StringComparison.InvariantCultureIgnoreCase);
 
         private async Task AddOutdatedProjectsIfNeeded(Project project, ConcurrentBag<AnalyzedProject> outdatedProjects)
@@ -624,7 +624,7 @@ namespace DotNetOutdated
 
             await Task.WhenAll(tasks);
 
-            if (outdatedFrameworks.Count > 0)
+            if (!outdatedFrameworks.IsEmpty)
                 outdatedProjects.Add(new AnalyzedProject(project.Name, project.FilePath, outdatedFrameworks));
         }
 
@@ -655,7 +655,7 @@ namespace DotNetOutdated
 
             await Task.WhenAll(tasks);
 
-            if (outdatedDependencies.Count > 0)
+            if (!outdatedDependencies.IsEmpty)
                 outdatedFrameworks.Add(new AnalyzedTargetFramework(targetFramework.Name, outdatedDependencies));
         }
 

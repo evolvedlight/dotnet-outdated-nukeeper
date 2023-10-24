@@ -14,7 +14,7 @@ namespace DotNetOutdated
             this.UpgradedPackages = CalculateUpgradedPackages(branch);
         }
 
-        private List<PackageAndVersion> CalculateUpgradedPackages(Branch branch)
+        private static List<PackageAndVersion> CalculateUpgradedPackages(Branch branch)
         {
             if (branch.FriendlyName.Contains("/upgrade_"))
             {
