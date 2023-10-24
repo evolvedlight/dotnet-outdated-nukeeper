@@ -30,21 +30,21 @@ jobs:
       id: cache-sonar-scanner
       uses: actions/cache@v3
       with:
-        path: ./.sonar/scanner
+        path: .sonar/scanner
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
     - name: Install SonarCloud scanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       run: |
-        mkdir ./.sonar/scanner
-        dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
+        mkdir .sonar/scanner
+        dotnet tool update dotnet-sonarscanner --tool-path .sonar/scanner
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin /k:"evolvedlight_neukeeper" /o:"stephen-brown" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+        .sonar/scanner/dotnet-sonarscanner begin /k:"evolvedlight_neukeeper" /o:"stephen-brown" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
         dotnet pack neukeeper/neukeeper.csproj -c release -p:PackageVersion=0.0.${{github.run_number}} --output nupkgs /p:Version=0.0.${{github.run_number}}
-        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
     - name: Upload nuget
       uses: actions/upload-artifact@v3
       with:
