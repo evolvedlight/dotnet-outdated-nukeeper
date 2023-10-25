@@ -61,11 +61,14 @@ namespace neukeeper.providers.github
                 g2repo.Network.Push(g2repo.Branches[prDetails.BranchName], options);
             }
 
+            var repoUrlUri = new Uri(projectUrl);
+            var owner = repoUrlUri.Segments[1].TrimEnd('/');
+            var repoName = repoUrlUri.Segments[2].TrimEnd('/');
 
             InMemoryCredentialStore credentials = new InMemoryCredentialStore(new Octokit.Credentials(_token));
             var client = new GitHubClient(new ProductHeaderValue("neukeeper"), credentials);
             
-            var repo = await client.Repository.Get("evolvedlight", "sample-outdated");
+            var repo = await client.Repository.Get(owner, repoName);
             var newPullRequest = new NewPullRequest(prDetails.Title, prDetails.BranchName, repo.DefaultBranch)
             {
                 Body = prDetails.BodyMarkdown

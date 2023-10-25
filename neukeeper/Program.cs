@@ -308,6 +308,7 @@ namespace DotNetOutdated
         {
             string? branchName;
             string? title;
+
             if (upgradeResult.UpgradedPackages.Count == 1)
             {
                 var dep = upgradeResult.UpgradedPackages[0];
@@ -325,12 +326,23 @@ namespace DotNetOutdated
             var body = new StringBuilder();
             body.AppendLine("This bumps the following packages:");
             body.AppendLine();
-            body.AppendLine("| Package | Old Version | New Version |");
-            body.AppendLine("| - | - | - |");
+            body.AppendLine("| Project | Package | Old Version | New Version |");
+            body.AppendLine("| - | - | - | - |");
 
             foreach (var upgrade in upgradeResult.UpgradedPackages)
             {
-                body.AppendLine($"| {upgrade.Name} | {upgrade.ResolvedVersion} | {upgrade.LatestVersion} |");
+                if (upgrade.Projects != null)
+                {
+                    foreach (var project in upgrade.Projects)
+                    {
+                        body.AppendLine($"| {project.Project} | {upgrade.Name} | {upgrade.ResolvedVersion} | {upgrade.LatestVersion} |");
+                    }
+                }
+                else
+                {
+                    body.AppendLine($"|  | {upgrade.Name} | {upgrade.ResolvedVersion} | {upgrade.LatestVersion} |");
+                }
+                
             }
 
             return new PrDetails
@@ -446,27 +458,35 @@ namespace DotNetOutdated
                         console.Write("...");
                         console.WriteLine();
 
+
+                        var packageSuccess = true;
+
                         foreach (var project in package.Projects)
                         {
                             RunStatus status = package.IsVersionCentrallyManaged
                                 ? _centralPackageVersionManagementService.AddPackage(project.ProjectFilePath, package.Name, package.LatestVersion, NoRestore)
                                 : _dotNetAddPackageService.AddPackage(project.ProjectFilePath, package.Name, project.Framework.ToString(), package.LatestVersion, NoRestore, IgnoreFailedSources);
                             
+
                             if (status.IsSuccess)
                             {
                                 console.Write($"Project {project.Description} upgraded successfully", Constants.ReporingColors.UpgradeSuccess);
                                 console.WriteLine();
-                                upgradedPackages.Add(package);
                                 upgradedProjects.Add(project);
                             }
                             else
                             {
+                                packageSuccess = false;
                                 success = false;
                                 console.Write($"An error occurred while upgrading {project.Project}", Constants.ReporingColors.UpgradeFailure);
                                 console.WriteLine();
                                 console.Write(status.Errors, Constants.ReporingColors.UpgradeFailure);
                                 console.WriteLine();
                             }
+                        }
+                        if (packageSuccess)
+                        {
+                            upgradedPackages.Add(package);
                         }
                     }
 
