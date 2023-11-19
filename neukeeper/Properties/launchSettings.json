@@ -4,7 +4,7 @@
       "commandName": "Project",
       "commandLineArgs": "-pr -u --username=\"evolvedlight\" --commitEmail=\"steve@brown.bg\" -type=\"Github\" https://github.com/evolvedlight/sample-outdated-multiple",
       "environmentVariables": {
-        "REPO_TOKEN": "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"
+        "REPO_TOKEN": "<todo>"
       }
     }
   }
