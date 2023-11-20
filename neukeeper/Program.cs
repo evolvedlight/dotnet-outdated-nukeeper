@@ -324,7 +324,7 @@ namespace DotNetOutdated
             }
 
             var body = new StringBuilder();
-            body.AppendLine("This bumps the following packages:");
+            body.AppendLine("This upgrades the following packages:");
             body.AppendLine();
             body.AppendLine("| Project | Package | Old Version | New Version |");
             body.AppendLine("| - | - | - | - |");
@@ -342,7 +342,12 @@ namespace DotNetOutdated
                 {
                     body.AppendLine($"|  | {upgrade.Name} | {upgrade.ResolvedVersion} | {upgrade.LatestVersion} |");
                 }
-                
+            }
+
+            if (upgradeResult.UpgradedPackages.All(p => p.IsVersionCentrallyManaged))
+            {
+                body.AppendLine();
+                body.AppendLine("Central package management is used ✔️");
             }
 
             return new PrDetails
@@ -365,27 +370,17 @@ namespace DotNetOutdated
 
                 var branchName = prDetails.BranchName;
                 var branch = repo.CreateBranch(branchName);
-                Remote remote = repo.Network.Remotes["origin"];
-                foreach (var projectPath in upgradeResult.UpgradedProjects.Select(x => x.ProjectFilePath).Distinct())
-                {
-                    if (string.IsNullOrEmpty(projectPath))
-                    {
-                        // should not happen
-                        continue;
-                    }
 
-                    var relativePath = Path.GetRelativePath(repo.Info.WorkingDirectory, projectPath);
-                    repo.Index.Add(relativePath);
-                    console.WriteLine($"Added {relativePath} to branch");
-                    repo.Index.Write();
-                }
+                Commands.Checkout(repo, branch);
+
+                Remote remote = repo.Network.Remotes["origin"];
+
+                Commands.Stage(repo, "*");
 
                 // Create the committer's signature and commit
                 Signature author = new Signature(Username, CommitEmail, DateTime.Now);
                 Signature committer = author;
-
-                // Commit to the repository
-                Commands.Checkout(repo, branch);
+                
                 repo.Commit(prDetails.Title, author, committer);
 
                 repo.Branches.Update(branch,
