@@ -318,7 +318,14 @@ namespace DotNetOutdated
             else
             {
                 var count = upgradeResult.UpgradedPackages.Count;
-                var hash = upgradeResult.UpgradedPackages.Select(x => x.Name?.GetHashCode() + x.Projects?.Select(p => p.Project?.GetHashCode()).Sum()).Aggregate((a, b) => unchecked(a + b)) % 397;
+                var hash = upgradeResult.UpgradedPackages
+                    .Select(package =>
+                    {
+                        var nameHash = package.Name?.GetHashCode() ?? 0;
+                        var projectHashes = package.Projects?.Select(project => project.Project?.GetHashCode() ?? 0).Sum() ?? 0;
+                        return unchecked(nameHash + projectHashes) % 397;
+                    })
+                    .Aggregate((a, b) => unchecked(a + b)) % 397;
                 branchName = $"neukeeper/{count}_upgrades_{hash}";
                 title = $"Neukeeper: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
             }
