@@ -48,7 +48,7 @@ jobs:
     - name: Build
       run: |
         .sonar/scanner/dotnet-sonarscanner begin /k:"evolvedlight_neukeeper" /o:"stephen-brown" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-        dotnet pack neukeeper/neukeeper.csproj -c release -p:PackageVersion=0.0.${{github.run_number}} --output nupkgs /p:Version=0.0.${{github.run_number}}
+        dotnet pack neukeeper/neukeeper.csproj -c release -p:PackageVersion=0.8.${{github.run_number}} --output nupkgs /p:Version=0.8.${{github.run_number}}
         .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
     - name: Upload nuget
       uses: actions/upload-artifact@v3
