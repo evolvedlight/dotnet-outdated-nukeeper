@@ -247,20 +247,25 @@ namespace DotNetOutdated
                     // Upgrade the packages
                     var upgradeResult = UpgradePackages(outdatedProjects, console, MaxPackageUpdates, currentUpgradePrs);
 
-                    if (CreatePr)
+                    if (!upgradeResult.Success)
                     {
-                        var mainBranch = GetMainBranch(path);
-                        var prDetails = CreatePrDetails(upgradeResult);
-                        var branch = CreateBranch(path, upgradeResult, console, prDetails);
-                        var pr = await service.CreatePr(ProjectUrl, path, prDetails, mainBranch);
-
-                        console.WriteLine($"Create PR: {pr} on branch {branch}");
+                        console.WriteLine("There were errors while upgrading packages. These will have to be done manually (or try to streamline dependencies to reduce incompatible dependency upgrades");
                     }
-
-                    if (!Upgrade.HasValue)
+                    else
                     {
-                        console.WriteLine();
-                        console.WriteLine("You can upgrade packages to the latest version by passing the -u or -u:prompt option.");
+                        if (CreatePr)
+                        {
+                            var mainBranch = GetMainBranch(path);
+                            var prDetails = CreatePrDetails(upgradeResult);
+                            var branch = CreateBranch(path, upgradeResult, console, prDetails);
+                            var pr = await service.CreatePr(ProjectUrl, path, prDetails, mainBranch);
+
+                            console.WriteLine($"Create PR: {pr} on branch {branch}");
+                        }
+                        else
+                        {
+                            console.WriteLine($"Pass pr or createpr to create a pull request automatically");
+                        }
                     }
 
                     // Output report file
@@ -318,14 +323,9 @@ namespace DotNetOutdated
             else
             {
                 var count = upgradeResult.UpgradedPackages.Count;
-                var hash = upgradeResult.UpgradedPackages
-                    .Select(package =>
-                    {
-                        var nameHash = package.Name?.GetHashCode() ?? 0;
-                        var projectHashes = package.Projects?.Select(project => project.Project?.GetHashCode() ?? 0).Sum() ?? 0;
-                        return unchecked(nameHash + projectHashes) % 397;
-                    })
-                    .Aggregate((a, b) => unchecked(a + b)) % 397;
+
+                var hash = CalculateHash(upgradeResult);
+
                 branchName = $"neukeeper/{count}_upgrades_{hash}";
                 title = $"Neukeeper: Upgrade {upgradeResult.UpgradedPackages.Count} packages";
             }
@@ -363,6 +363,23 @@ namespace DotNetOutdated
                 title,
                 body.ToString()
             );
+        }
+
+        private static int CalculateHash(UpgradeResult upgradeResult)
+        {
+            var hash = 0;
+
+            foreach (var package in upgradeResult.UpgradedPackages)
+            {
+                hash = unchecked(hash + package.Name.GetHashCode());
+
+                foreach (var project in package.Projects)
+                {
+                    hash = unchecked(hash + project.Project.GetHashCode());
+                }
+            }
+
+            return hash % 397;
         }
 
         private string CreateBranch(string path, UpgradeResult upgradeResult, IConsole console, PrDetails prDetails)
