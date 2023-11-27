@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\neukeeper\neukeeper.csproj" />
     <ProjectReference Include="..\..\providers\bitbucket\bitbucket.csproj" />
   </ItemGroup>
 
