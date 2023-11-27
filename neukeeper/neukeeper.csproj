@@ -23,6 +23,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageTags>DotnetTool;DependencyUpdater;Automation;GitHub;Bitbucket;DependencyManagement;NuGet;MSBuild;CommandLineTool</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -56,6 +58,14 @@
     <None Include="..\README.md">
         <Pack>True</Pack>
         <PackagePath>\</PackagePath>
+    </None>
+    <None Include="icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Update="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
