@@ -62,7 +62,7 @@ jobs:
     - name: Build
       run: |
         .sonar/scanner/dotnet-sonarscanner begin /k:"evolvedlight_neukeeper" /o:"stephen-brown" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-        VERSION_SUFFIX=$(if [[ "${{ github.event_name }}" == "release" ]]; then echo "${{ github.ref }}"; else echo "1.0.${{ github.run_number }}-develop"; fi)
+        VERSION_SUFFIX=$(if [[ "${{ github.event_name }}" == "release" ]]; then echo "${{ github.ref_name }}"; else echo "1.0.${{ github.run_number }}-develop"; fi)
         dotnet pack neukeeper/neukeeper.csproj -p:PackageVersion=$VERSION_SUFFIX /p:Version=$VERSION_SUFFIX --configuration Release --output ${{ env.NuGetDirectory }}
         .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
     - name: Upload nuget
@@ -125,8 +125,8 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     needs: [ validate_nuget, test ]
-    steps:
-      # Download the NuGet package created in the previous job
+    steps:      
+        # Download the NuGet package created in the previous job
       - uses: actions/download-artifact@v3
         with:
           name: nuget
