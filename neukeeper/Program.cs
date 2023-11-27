@@ -379,7 +379,7 @@ namespace DotNetOutdated
                 }
             }
 
-            return hash % 397;
+            return Math.Abs(hash % 397);
         }
 
         private string CreateBranch(string path, UpgradeResult upgradeResult, IConsole console, PrDetails prDetails)
