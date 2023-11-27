@@ -143,5 +143,5 @@ jobs:
         run: |
           for file in ${{ env.NuGetDirectory }}/*.nupkg
           do
-            dotnet nuget push "$file" --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push "$file" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           done
