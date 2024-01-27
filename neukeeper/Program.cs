@@ -207,26 +207,19 @@ namespace DotNetOutdated
                     return -1;
                 }
 
-                console.Write("Checking out projects...");
+                console.WriteLine($"Checking out repository from {ProjectUrl}");
                 var service = _remoteRepoSelector.GetRemoteRepoService(Username, app.Options, RepoType, RepoToken);
                 var path = await service.CloneRepo(ProjectUrl);
 
-                
-
                 // Get all the projects
-                console.Write("Discovering projects...");
+                console.WriteLine("Discovering projects...");
 
                 DefaultCredentialServiceUtility.SetupDefaultCredentialService(new NuGet.Common.NullLogger(), true);
 
                 var projectPaths = _projectDiscoveryService.DiscoverProjects(path, Recursive);
 
-                if (!console.IsOutputRedirected)
-                    ClearCurrentConsoleLine();
-                else
-                    console.WriteLine();
-
                 // Analyze the projects
-                console.Write("Analyzing project(s)...");
+                console.WriteLine($"Analyzing ({projectPaths.Count}) project(s)...");
 
                 var projects = projectPaths.SelectMany(path => _projectAnalysisService.AnalyzeProject(path, false, Transitive, TransitiveDepth)).ToList();
 
