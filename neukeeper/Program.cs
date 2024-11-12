@@ -30,6 +30,8 @@ namespace DotNetOutdated
     using neukeeper.shared;
     using System.Linq;
     using neukeeper;
+    using NuGet.Packaging;
+    using System.Net.NetworkInformation;
 
     [Command(
         Name = "dotnet outdated",
@@ -42,7 +44,7 @@ namespace DotNetOutdated
         private readonly INuGetPackageResolutionService _nugetService;
         private readonly IProjectAnalysisService _projectAnalysisService;
         private readonly IProjectDiscoveryService _projectDiscoveryService;
-        private readonly IDotNetAddPackageService _dotNetAddPackageService;
+        private readonly IDotNetPackageService _dotNetPackageService;
         private readonly ICentralPackageVersionManagementService _centralPackageVersionManagementService;
         private readonly IRemoteRepoServiceSelector _remoteRepoSelector;
 
@@ -115,6 +117,15 @@ namespace DotNetOutdated
         [Option(CommandOptionType.NoValue, Description = "Treat package source failures as warnings.", ShortName = "ifs", LongName = "ignore-failed-sources")]
         public bool IgnoreFailedSources { get; set; } = false;
 
+        [Option(CommandOptionType.NoValue, Description = "Include all dependencies in the report even the ones not outdated.",
+          ShortName = "utd", LongName = "include-up-to-date")]
+        public bool IncludeUpToDate { get; set; } = false;
+
+        [Option(CommandOptionType.SingleValue, Description = "Specifies an optional label to restrict matches to when looking for pre-release versions of packages. " +
+                                                             "For example, a label of 'rc.1' would only match pre-release packages with a pre-release label that starts with that prefix.",
+            ShortName = "prl", LongName = "pre-release-label")]
+        public string PrereleaseLabel { get; set; } = string.Empty;
+
         [Option(CommandOptionType.NoValue, Description = "Specifies whether a PR shpuld be created. " +
                                                              "Possible values for <TYPE> is Auto (default) or Prompt.",
             ShortName = "pr", LongName = "createpr")]
@@ -152,7 +163,7 @@ namespace DotNetOutdated
                     .AddSingleton<IDotNetRunner, DotNetRunner>()
                     .AddSingleton<IDependencyGraphService, DependencyGraphService>()
                     .AddSingleton<IDotNetRestoreService, DotNetRestoreService>()
-                    .AddSingleton<IDotNetAddPackageService, DotNetAddPackageService>()
+                    .AddSingleton<IDotNetPackageService, DotNetPackageService>()
                     .AddSingleton<INuGetPackageInfoService, NuGetPackageInfoService>()
                     .AddSingleton<INuGetPackageResolutionService, NuGetPackageResolutionService>()
                     .AddSingleton<ICentralPackageVersionManagementService, CentralPackageVersionManagementService>();
@@ -171,22 +182,20 @@ namespace DotNetOutdated
             }
         }
 
-        public static string GetVersion()
-        {
-            var versionAssembly = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            Guard.IsNotNull(versionAssembly, nameof(versionAssembly));
-            return versionAssembly.InformationalVersion;
-        }
+        public static string GetVersion() => typeof(Program)
+          .Assembly
+          .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+          .InformationalVersion;
 
         public Program(IFileSystem fileSystem, IReporter reporter, INuGetPackageResolutionService nugetService, IProjectAnalysisService projectAnalysisService,
-            IProjectDiscoveryService projectDiscoveryService, IDotNetAddPackageService dotNetAddPackageService, ICentralPackageVersionManagementService centralPackageVersionManagementService, IRemoteRepoServiceSelector remoteRepoSelector)
+          IProjectDiscoveryService projectDiscoveryService, IDotNetPackageService dotNetPackageService, ICentralPackageVersionManagementService centralPackageVersionManagementService, IRemoteRepoServiceSelector remoteRepoSelector)
         {
             _fileSystem = fileSystem;
             _reporter = reporter;
             _nugetService = nugetService;
             _projectAnalysisService = projectAnalysisService;
             _projectDiscoveryService = projectDiscoveryService;
-            _dotNetAddPackageService = dotNetAddPackageService;
+            _dotNetPackageService = dotNetPackageService;
             _centralPackageVersionManagementService = centralPackageVersionManagementService;
             _remoteRepoSelector = remoteRepoSelector;
         }
@@ -221,7 +230,11 @@ namespace DotNetOutdated
                 // Analyze the projects
                 console.WriteLine($"Analyzing ({projectPaths.Count}) project(s)...");
 
-                var projects = projectPaths.SelectMany(path => _projectAnalysisService.AnalyzeProject(path, false, Transitive, TransitiveDepth)).ToList();
+                List<Project> projects = [];
+                foreach (var projectPath in projectPaths)
+                {
+                    projects.AddRange(await _projectAnalysisService.AnalyzeProjectAsync(path, false, Transitive, TransitiveDepth));
+                }
 
                 if (!console.IsOutputRedirected)
                     ClearCurrentConsoleLine();
@@ -407,10 +420,19 @@ namespace DotNetOutdated
 
                         foreach (var project in package.Projects)
                         {
-                            RunStatus status = package.IsVersionCentrallyManaged
-                                ? _centralPackageVersionManagementService.AddPackage(project.ProjectFilePath, package.Name, package.LatestVersion, NoRestore)
-                                : _dotNetAddPackageService.AddPackage(project.ProjectFilePath, package.Name, project.Framework.ToString(), package.LatestVersion, NoRestore, IgnoreFailedSources);
-                            
+                            RunStatus status = null;
+
+                            if (!project.IsProjectSdkStyle())
+                            {
+                                console.WriteLine("Project format not SDK style, removing package before upgrade.");
+                                status = _dotNetPackageService.RemovePackage(project.ProjectFilePath, package.Name);
+                            }
+
+                            if (status is null || status.IsSuccess)
+                                status = package.IsVersionCentrallyManaged
+                                   ? _centralPackageVersionManagementService.AddPackage(project.ProjectFilePath, package.Name, package.LatestVersion, NoRestore)
+                                   : _dotNetPackageService.AddPackage(project.ProjectFilePath, package.Name, project.Framework.ToString(), package.LatestVersion, NoRestore, IgnoreFailedSources);
+
 
                             if (status.IsSuccess)
                             {
@@ -626,23 +648,43 @@ namespace DotNetOutdated
         private async Task AddOutdatedDependencyIfNeeded(Project project, TargetFramework targetFramework, Dependency dependency, ConcurrentBag<AnalyzedDependency> outdatedDependencies)
         {
             var referencedVersion = dependency.ResolvedVersion;
-            NuGetVersion? latestVersion = null;
+            NuGetVersion latestVersion = null;
 
             if (referencedVersion != null)
             {
-                latestVersion = await _nugetService.ResolvePackageVersions(dependency.Name, referencedVersion, project.Sources, dependency.VersionRange,
-                    VersionLock, Prerelease, targetFramework.Name, project.FilePath, dependency.IsDevelopmentDependency, OlderThanDays, IgnoreFailedSources);
+                latestVersion = await _nugetService.ResolvePackageVersions(
+                    dependency.Name,
+                    referencedVersion,
+                    project.Sources,
+                    dependency.VersionRange,
+                    VersionLock,
+                    Prerelease,
+                    PrereleaseLabel,
+                    targetFramework.Name,
+                    project.FilePath,
+                    dependency.IsDevelopmentDependency,
+                    OlderThanDays,
+                    IgnoreFailedSources).ConfigureAwait(false);
             }
 
-            if (referencedVersion == null || latestVersion == null || referencedVersion != latestVersion)
+            if (referencedVersion == null || latestVersion == null || referencedVersion != latestVersion || IncludeUpToDate)
             {
                 // special case when there is version installed which is not older than "OlderThan" days makes "latestVersion" to be null
                 if (OlderThanDays > 0 && latestVersion == null)
                 {
-                    NuGetVersion absoluteLatestVersion = await _nugetService.ResolvePackageVersions(dependency.Name, referencedVersion, project.Sources, dependency.VersionRange,
-                        VersionLock, Prerelease, targetFramework.Name, project.FilePath, dependency.IsDevelopmentDependency);
+                    NuGetVersion absoluteLatestVersion = await _nugetService.ResolvePackageVersions(
+                        dependency.Name,
+                        referencedVersion,
+                        project.Sources,
+                        dependency.VersionRange,
+                        VersionLock,
+                        Prerelease,
+                        PrereleaseLabel,
+                        targetFramework.Name,
+                        project.FilePath,
+                        dependency.IsDevelopmentDependency).ConfigureAwait(false);
 
-                    if (referencedVersion!= null && (absoluteLatestVersion == null || referencedVersion > absoluteLatestVersion))
+                    if (absoluteLatestVersion == null || referencedVersion > absoluteLatestVersion)
                     {
                         outdatedDependencies.Add(new AnalyzedDependency(dependency, latestVersion));
                     }

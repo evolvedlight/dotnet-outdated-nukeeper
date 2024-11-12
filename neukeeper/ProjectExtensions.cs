@@ -1,4 +1,6 @@
 ﻿using DotNetOutdated.Models;
+using static DotNetOutdated.ConsolidatedPackage;
+using System.Xml.Linq;
 
 namespace DotNetOutdated
 {
@@ -55,6 +57,30 @@ namespace DotNetOutdated
                 .ToList();
 
             return consolidatedPackages;
+        }
+
+        public static bool IsProjectSdkStyle(this PackageProjectReference project)
+        {
+            try
+            {
+                var xml = XDocument.Load(project.ProjectFilePath);
+
+                if (xml.Root == null)
+                {
+                    return false;
+                }
+
+                // If the project file declares the xmlns attribute, we need to account for it in queries for elements.
+                // Otherwise the query will return no results and the project type will be misidentified.
+                // e.g. <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Sdk="Microsoft.NET.Sdk">
+                XNamespace ns = xml.Root.GetDefaultNamespace();
+                return xml.Root.Name == (ns + "Project") && !string.IsNullOrEmpty(xml.Root.Attribute("Sdk")?.Value);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while reading project file: {ex.Message}");
+                return false;
+            }
         }
     }
 }
