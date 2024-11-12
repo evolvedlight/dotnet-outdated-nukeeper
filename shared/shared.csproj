@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.2.2" />
+    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.3.2" />
     <PackageReference Include="libgit2sharp-evolvedlight" Version="0.0.0-preview.0.1893" />
-    <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
-    <PackageReference Include="NuGet.Versioning" Version="6.8.0" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.11.1" />
+    <PackageReference Include="NuGet.Versioning" Version="6.11.1" />
   </ItemGroup>
 
 </Project>

@@ -37,6 +37,8 @@ Then run:
 neukeeper http://localhost:17990/projects/TEST/repos/sample-outdated/browse --repo-type="BitbucketServer" -pr -u --username="evo" --commitEmail="steve@brown.bg"
 ```
 
+dotnet run -- http://localhost:7990/projects/TP/repos/oldthing/browse --repo-type="BitbucketServer" -pr -u --username="evo" --commitEmail="steve@brown.bg"
+
 ### Optional Arguments
 
 #### Max packages to update
